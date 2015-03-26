@@ -36,7 +36,7 @@ module.exports = function (app, passport) {
     
     app.post('/profile', function (req, res) {
 
-        var query = Profile.where({ encodedId: update.ownerId });
+        var query = Profile.where({ encodedId: req.user.encodedId });
 
         // find the current user's profile
         query.findOne(function (err, data) {            
