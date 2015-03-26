@@ -1,5 +1,7 @@
 var FitbitStrategy = require('passport-fitbit').Strategy;
+
 var Profile = require('../app/models/profile');
+var FitbitApiClient = require("fitbit-node");
 
 module.exports = function (passport, port) {
 
@@ -19,35 +21,34 @@ module.exports = function (passport, port) {
         function (token, tokenSecret, profile, done) {
             process.nextTick(function () {
 
-                var query = Profile.where({ encodedId: profile._json.user.encodedId });
-
-                query.findOne(function (err, data) {
-                    if (data) {
-                        data.fullName = profile._json.user.fullName;
-                        data.timezone = profile._json.user.timezone;
-                        data.strideLengthWalking = profile._json.user.strideLengthWalking;
-
-                        data.save();
-
-                        return done(null, data);
-                    } else {
-                        var insert = new Profile({
-                            encodedId: profile._json.user.encodedId,
-                            oauthToken: token,
-                            oauthTokenSecret: tokenSecret,
-                            fullName: profile._json.user.fullName,
-                            timezone: profile._json.user.timezone,
-                            strideLengthWalking: profile._json.user.strideLengthWalking,
-                            phoneNumber: null,
-                            isPhoneNumberVerified: false,
-                            lastSyncTime: null,
-                            lastNotificationTime: null
-                        });
-
-                        insert.save();
-
-                        return done(null, insert);
+                // look up user's profile in database or create one if they don't exist
+                Profile.findOrCreate({ encodedId: profile.id }, function (err, data, created) {
+                    data.oauthToken = token;
+                    data.oauthTokenSecret = tokenSecret;
+                    data.fullName = profile._json.user.fullName;
+                    data.timezone = profile._json.user.timezone;
+                    data.strideLengthWalking = profile._json.user.strideLengthWalking;
+                    
+                    // if this is a new user, set some additional defaults
+                    if (created) {
+                        data.phoneNumber = null;
+                        data.isPhoneNumberVerified = false;
+                        data.lastSyncTime = null;
+                        data.lastNotificationTime = nul;
                     }
+                    
+                    data.save();
+                
+                    // connect to the fitbit api
+                    var client = new FitbitApiClient(process.env.FITBIT_CONSUMER_KEY, process.env.FITBIT_CONSUMER_SECRET);
+                    
+                    // ensure that we have a subscription for this user
+                    client.requestResource('/activities/apiSubscriptions/' + data.encodedId + '.json', 'POST', data.oauthToken, data.oauthTokenSecret).then(function (results) {
+                        var response = results[0];
+                        res.send(response);
+                    });
+                    
+                    return done(null, data);
                 });
             });
         }
