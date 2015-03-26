@@ -5,10 +5,8 @@ var port     = process.env.PORT || 8080;
 var mongoose = require('mongoose');
 var passport = require('passport');
 
-var database = require('./config/database');
-
 // configuration ===============================================================
-// mongoose.connect(database.url);
+mongoose.connect(process.env.DATABASE_URL);
 
 require('./config/passport')(passport, port);
 

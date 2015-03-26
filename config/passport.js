@@ -1,4 +1,5 @@
 var FitbitStrategy = require('passport-fitbit').Strategy;
+var os = require('os');
 
 module.exports = function (passport, port) {
 
@@ -11,9 +12,9 @@ module.exports = function (passport, port) {
     });
 
     passport.use(new FitbitStrategy({
-            consumerKey: "e725b07ba46547e7b0d03d46ea8f0098",
-            consumerSecret: "73f8946f63b2481c86fb73f6a4a56694",
-            callbackURL: "http://127.0.0.1:" + port + "/auth/fitbit/callback"
+            consumerKey: process.env.FITBIT_CONSUMER_KEY,
+            consumerSecret: process.env.FITBIT_CONSUMER_SECRET,
+            callbackURL: 'http://' + os.hostname() + ':' + port + '/auth/fitbit/callback'
         },
         function (token, tokenSecret, profile, done) {
             // asynchronous verification, for effect...
