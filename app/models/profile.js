@@ -1,6 +1,8 @@
 var mongoose = require('mongoose');
 var findOrCreate = require('mongoose-findorcreate');
 
+var Schema = mongoose.Schema;
+
 var ProfileSchema  = new Schema({
     encodedId: String,
     oauthToken: String,
@@ -14,6 +16,6 @@ var ProfileSchema  = new Schema({
     lastNotificationTime: Date
 });
 
-ProfileSchmea.plugin(findOrCreate);
+ProfileSchema.plugin(findOrCreate);
 
 module.exports = mongoose.model('Profile', ProfileSchema);
