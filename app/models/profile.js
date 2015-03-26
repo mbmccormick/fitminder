@@ -5,7 +5,6 @@ module.exports = mongoose.model('Profile', {
     oauthToken: String,
     oauthTokenSecret: String,
     fullName: String,
-    nickname: String,
     timezone: String,
     strideLengthWalking: Number,
     phoneNumber: String,

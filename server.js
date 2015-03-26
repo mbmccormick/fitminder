@@ -27,7 +27,7 @@ app.configure(function() {
 });
 
 // routes ======================================================================
-require('./app/routes.js')(app, passport);
+require('./app/routes')(app, passport);
 
 // listen ======================================================================
 app.listen(port);

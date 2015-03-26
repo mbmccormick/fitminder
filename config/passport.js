@@ -1,4 +1,5 @@
 var FitbitStrategy = require('passport-fitbit').Strategy;
+var Profile = require('../app/models/profile');
 
 module.exports = function (passport, port) {
 
@@ -16,14 +17,38 @@ module.exports = function (passport, port) {
             callbackURL: 'http://' + process.env.HOSTNAME + '/auth/fitbit/callback'
         },
         function (token, tokenSecret, profile, done) {
-            // asynchronous verification, for effect...
             process.nextTick(function () {
 
-                // To keep the example simple, the user's Fitbit profile is returned to
-                // represent the logged-in user.  In a typical application, you would want
-                // to associate the Fitbit account with a user record in your database,
-                // and return that user instead.
-                return done(null, profile);
+                var query = Profile.where({ encodedId: profile._json.user.encodedId });
+
+                query.findOne(function (err, data) {
+                    if (data) {
+                        data.fullName = profile._json.user.fullName;
+                        data.timezone = profile._json.user.timezone;
+                        data.strideLengthWalking = profile._json.user.strideLengthWalking;
+
+                        data.save();
+
+                        return done(null, data);
+                    } else {
+                        var insert = new Profile({
+                            encodedId: profile._json.user.encodedId,
+                            oauthToken: token,
+                            oauthTokenSecret: tokenSecret,
+                            fullName: profile._json.user.fullName,
+                            timezone: profile._json.user.timezone,
+                            strideLengthWalking: profile._json.user.strideLengthWalking,
+                            phoneNumber: null,
+                            isPhoneNumberVerified: false,
+                            lastSyncTime: null,
+                            lastNotificationTime: null
+                        });
+
+                        insert.save();
+
+                        return done(null, insert);
+                    }
+                });
             });
         }
     ));
