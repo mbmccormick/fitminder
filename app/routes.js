@@ -1,4 +1,6 @@
-module.exports = function(app, passport) {
+var Profile = require('./models/profile');
+
+module.exports = function (app, passport) {
 
     app.get('/', function (req, res) {
 
@@ -21,6 +23,29 @@ module.exports = function(app, passport) {
 	app.get('/auth/fitbit/callback', passport.authenticate('fitbit', { failureRedirect: '/login' }), function(req, res) {
 
 	    res.redirect('/');
+
+	});
+
+	app.post('/api/payload', function (req, res) {
+
+	    var json = JSON.parse(req.body);
+	    console.log(json);
+
+	    for (var update in json) {
+	        var query = Profile.where({ encodedId: update.ownerId });
+
+	        query.findOne(function (err, data) {
+	            if (data) {
+                    // TODO: process incoming payload
+
+	                data.lastSyncTime = Date.now;
+
+	                data.save();
+
+	                return done(null, data);
+	            }
+	        });
+	    }
 
 	});
 
