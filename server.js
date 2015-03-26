@@ -12,17 +12,17 @@ require('./config/passport')(passport, port);
 
 app.configure(function() {
 
-	// set up our express application
-	app.use(express.logger('dev'));
-	app.use(express.cookieParser());
-	app.use(express.bodyParser());
+    // set up our express application
+    app.use(express.logger('dev'));
+    app.use(express.cookieParser());
+    app.use(express.bodyParser());
 
-	app.set('view engine', 'ejs');
+    app.set('view engine', 'ejs');
 
-	// required for passport
-	app.use(express.session({ secret: 'fitminder' }));
-	app.use(passport.initialize());
-	app.use(passport.session());
+    // required for passport
+    app.use(express.session({ secret: 'fitminder' }));
+    app.use(passport.initialize());
+    app.use(passport.session());
 
 });
 

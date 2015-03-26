@@ -6,54 +6,54 @@ module.exports = function (app, passport) {
 
         res.render('index', { user: req.user });
 
-	});
+    });
 
-	app.get('/login', function(req, res) {
+    app.get('/login', function(req, res) {
 
-	    res.render('login', { user: req.user });
+        res.render('login', { user: req.user });
 
-	});
+    });
 
-	app.get('/auth/fitbit', passport.authenticate('fitbit'), function (req, res) {
+    app.get('/auth/fitbit', passport.authenticate('fitbit'), function (req, res) {
 
         // do nothing
-	    
-	});
+        
+    });
 
-	app.get('/auth/fitbit/callback', passport.authenticate('fitbit', { failureRedirect: '/login' }), function(req, res) {
+    app.get('/auth/fitbit/callback', passport.authenticate('fitbit', { failureRedirect: '/login' }), function(req, res) {
 
-	    res.redirect('/');
+        res.redirect('/');
 
-	});
+    });
 
-	app.post('/api/payload', function (req, res) {
+    app.post('/api/payload', function (req, res) {
 
-	    var json = JSON.parse(req.body);
-	    console.log(json);
+        var json = JSON.parse(req.body);
+        console.log(json);
 
-	    for (var update in json) {
-	        var query = Profile.where({ encodedId: update.ownerId });
+        for (var update in json) {
+            var query = Profile.where({ encodedId: update.ownerId });
 
-	        query.findOne(function (err, data) {
-	            if (data) {
+            query.findOne(function (err, data) {
+                if (data) {
                     // TODO: process incoming payload
 
-	                data.lastSyncTime = Date.now;
+                    data.lastSyncTime = Date.now;
 
-	                data.save();
+                    data.save();
+                }
+            });
+        }
 
-	                return done(null, data);
-	            }
-	        });
-	    }
+        res.status(204); // acknowledge the notification
 
-	});
+    });
 
-	app.get('/logout', function (req, res) {
+    app.get('/logout', function (req, res) {
 
-		req.logout();
-		res.redirect('/');
+        req.logout();
+        res.redirect('/');
 
-	});
+    });
 
 };
