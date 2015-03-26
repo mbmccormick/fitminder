@@ -1,13 +1,14 @@
 {
-  "name": "fitminder",
-  "main": "server.js",
-  "dependencies": {
-    "express": "~4.12.3",
-    "ejs": "~2.3.1",
-    "mongoose": "~4.0.0",
-	"mongoose-findorcreate": "~0.1.2",
-    "passport": "~0.2.1", 
-    "passport-fitbit": "0.1.2",
-	"fitbit-node": "~0.1.0"
-  }
+    "name": "fitminder",
+    "main": "server.js",
+    "dependencies": {
+        "express": "~4.12.3",
+        "ejs": "~2.3.1",
+        "mongoose": "~4.0.0",
+        "mongoose-findorcreate": "~0.1.2",
+        "passport": "~0.2.1", 
+        "passport-fitbit": "0.1.2",
+        "fitbit-node": "~0.1.0",
+        "twilio": "~1.11.1"
+    }
 }

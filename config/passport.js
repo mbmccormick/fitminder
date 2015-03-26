@@ -1,7 +1,7 @@
 var FitbitStrategy = require('passport-fitbit').Strategy;
 
 var Profile = require('../app/models/profile');
-var FitbitApiClient = require("fitbit-node");
+var FitbitApiClient = require('fitbit-node');
 
 module.exports = function (passport, port) {
 
@@ -34,7 +34,7 @@ module.exports = function (passport, port) {
                         data.phoneNumber = null;
                         data.isPhoneNumberVerified = false;
                         data.lastSyncTime = null;
-                        data.lastNotificationTime = nul;
+                        data.lastNotificationTime = null;
                     }
                     
                     data.save();

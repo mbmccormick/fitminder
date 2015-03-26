@@ -1,2 +1,11 @@
-<p>ID: <%= user.encodedId %></p>
-<p>Full Name: <%= user.fullName %></p>
+<form>
+    <p><b>ID: <b><%= user.encodedId %></p>
+    <p><b>Full Name:</b> <%= user.fullName %></p>
+    <p><b>Timezone:</b> <%= user.timezone %></p>
+    <p><b>Phone Number:</b> <input name="phoneNumber" type="text" value="<%= user.phoneNumber %>" /></p>
+    <p><b>Is Phone Number Verified:</b> <%= user.isPhoneNumberVerified %></p>
+    <p><b>Last Sync Time:</b> <%= user.lastSyncTime %></p>
+    <p><b>Last Notification Time:</b> <%= user.lastNotificationTime %></p>
+    
+    <input type="submit">Save</input>
+</form>
