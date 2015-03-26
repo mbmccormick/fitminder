@@ -3,7 +3,7 @@ var FitbitStrategy = require('passport-fitbit').Strategy;
 var Profile = require('../app/models/profile');
 var FitbitApiClient = require('fitbit-node');
 
-module.exports = function (passport, port) {
+module.exports = function (passport) {
 
     passport.serializeUser(function (user, done) {
         done(null, user);
