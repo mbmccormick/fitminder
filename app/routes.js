@@ -52,7 +52,7 @@ module.exports = function (app, passport) {
                 TwilioApiClient.sendMessage({
                         to: data.phoneNumber,
                         from: process.env.TWILIO_PHONE_NUMBER,
-                        body: 'Hey, ' + data.fullName + '! Thanks for signing up for Fitminder. Please reply \"yes\" to confirm your phone number.'
+                        body: 'Hey, ' + data.nickname + '! Thanks for signing up for Fitminder. Please reply \"yes\" to confirm your phone number.'
                     }, function (err, responseData) { 
                         
                         // TODO: add error handling
@@ -68,7 +68,33 @@ module.exports = function (app, passport) {
     
     app.post('/api/twilio/inbound', function (req, res) {
     
-        // TODO: process phone number verification
+        var query = Profile.where({ phoneNumber: req.body.From });
+
+        // find the user profile associated with this phone number
+        query.findOne(function (err, data) {
+            
+            // check to see if they correctly verified their number
+            if (req.body.Body.trim().toUpperCase() == 'YES') {
+                data.isPhoneNumberVerified = true;
+                
+                data.save();
+                
+                // send a text message to confirm receipt
+                TwilioApiClient.sendMessage({
+                        to: data.phoneNumber,
+                        from: process.env.TWILIO_PHONE_NUMBER,
+                        body: 'Awesome. Your phone number has been verified!'
+                    }, function (err, responseData) {
+                        
+                        // TODO: add error handling
+                    
+                    }
+                );
+            }
+        });
+
+        // acknowledge the request
+        res.status(200).end();
 
     });
 
@@ -91,7 +117,7 @@ module.exports = function (app, passport) {
                     
                 // TODO: process user's activity timeseries data
 
-                data.lastSyncTime = Date.now;
+                data.lastSyncTime = Date.now();
 
                 console.log('data synced syccessfully');
 
