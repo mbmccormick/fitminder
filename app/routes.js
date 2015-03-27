@@ -75,27 +75,27 @@ module.exports = function (app, passport) {
     app.post('/api/fitbit/notification', function (req, res) {
 
         // process the individual notifications
-        for (var update in req.body) {
-            var query = Profile.where({ encodedId: update.ownerId });
+        for (var i = 0; i < req.body.length; i++) {
+            var query = Profile.where({ encodedId: req.body[i].ownerId });
 
             // find the user associated with this notification
             query.findOne(function (err, data) {
-                if (data) {
-                    // connect to the fitbit api
-                    var client = new FitbitApiClient(process.env.FITBIT_CONSUMER_KEY, process.env.FITBIT_CONSUMER_SECRET);
+                // connect to the fitbit api
+                var client = new FitbitApiClient(process.env.FITBIT_CONSUMER_KEY, process.env.FITBIT_CONSUMER_SECRET);
                     
-                    // fetch the user's activity timeseries data
-                    client.requestResource('/activities/calories/date/today/1d/15min.json', 'GET', data.oauthToken, data.oauthTokenSecret).then(function (results) {
-                        var response = results[0];
-                        res.send(response);
-                    });
+                // fetch the user's activity timeseries data
+                client.requestResource('/activities/calories/date/today/1d/15min.json', 'GET', data.oauthToken, data.oauthTokenSecret).then(function (results) {
+                    var response = results[0];
+                    res.send(response);
+                });
                     
-                    // TODO: process user's activity timeseries data
+                // TODO: process user's activity timeseries data
 
-                    data.lastSyncTime = Date.now;
+                data.lastSyncTime = Date.now;
 
-                    data.save();
-                }
+                console.log('data synced syccessfully');
+
+                data.save();
             });
         }
 
