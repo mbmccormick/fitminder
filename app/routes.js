@@ -39,7 +39,7 @@ module.exports = function (app, passport) {
         var query = Profile.where({ encodedId: req.user.encodedId });
 
         // find the current user's profile
-        query.findOne(function (err, data) {            
+        query.findOne(function (err, data) {
             
             // check to see if they are changing their phone number
             if (data.phoneNumber != req.body.phoneNumber) {
@@ -60,6 +60,9 @@ module.exports = function (app, passport) {
                     }
                 );
             }
+            
+            // update the user's profile currently stored in session
+            req.user = data;
         });
         
         res.render('profile', { user: req.user });
@@ -118,8 +121,6 @@ module.exports = function (app, passport) {
                 // TODO: process user's activity timeseries data
 
                 data.lastSyncTime = Date.now();
-
-                console.log('data synced syccessfully');
 
                 data.save();
             });

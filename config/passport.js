@@ -6,11 +6,13 @@ var FitbitApiClient = require('fitbit-node');
 module.exports = function (passport) {
 
     passport.serializeUser(function (user, done) {
-        done(null, user);
+        done(null, user.id);
     });
 
-    passport.deserializeUser(function (obj, done) {
-        done(null, obj);
+    passport.deserializeUser(function (id, done) {
+        Profile.findById(id, function (err, profile) {
+            done(err, profile);
+        });
     });
 
     passport.use(new FitbitStrategy({
@@ -26,7 +28,7 @@ module.exports = function (passport) {
                     data.oauthToken = token;
                     data.oauthTokenSecret = tokenSecret;
                     data.fullName = profile._json.user.fullName;
-					data.nickname = profile._json.user.nickname || profile._json.user.fullName.split(' ')[0];
+                    data.nickname = profile._json.user.nickname || profile._json.user.fullName.split(' ')[0];
                     data.timezone = profile._json.user.timezone;
                     data.strideLengthWalking = profile._json.user.strideLengthWalking;
                     

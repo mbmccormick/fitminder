@@ -8,7 +8,7 @@ var ProfileSchema  = new Schema({
     oauthToken: String,
     oauthTokenSecret: String,
     fullName: String,
-	nickname: String,
+    nickname: String,
     timezone: String,
     strideLengthWalking: Number,
     phoneNumber: String,
