@@ -43,7 +43,7 @@ module.exports = function (app, passport) {
             
             // check to see if they are changing their phone number
             if (data.phoneNumber != req.body.phoneNumber) {
-                data.phoneNumber = req.body.phoneNumber.startsWith('+1') ? req.body.phoneNumber : '+1' + req.body.phoneNumber;
+                data.phoneNumber = (req.body.phoneNumber.indexOf('+1', 0) === 0 ? req.body.phoneNumber : '+1' + req.body.phoneNumber);
                 data.isPhoneNumberVerified = false;
                 
                 data.save();
@@ -67,8 +67,8 @@ module.exports = function (app, passport) {
     });
     
     app.post('/api/twilio/inbound', function (req, res) {
-    
-        var query = Profile.where({ phoneNumber: (req.body.From.startsWith('+1') ? req.body.From : '+1' + req.body.From) });
+
+        var query = Profile.where({ phoneNumber: (req.body.From.indexOf('+1', 0) === 0 ? req.body.From : '+1' + req.body.From) });
 
         // find the user profile associated with this phone number
         query.findOne(function (err, data) {
