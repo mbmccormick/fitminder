@@ -135,7 +135,7 @@ module.exports = function(app, passport) {
                 
                 // check if phone number is verified and last notification was sent at least 2 hours ago
                 if (data.isPhoneNumberVerified &&
-                    data.lastNotificationTime < (Date.now() - (4 * 60 * 60))) {
+                    data.lastNotificationTime < (Date.now() - (2 * 60 * 60 * 1000))) {
                     // connect to the fitbit api
                     var client = new FitbitApiClient(process.env.FITBIT_CONSUMER_KEY, process.env.FITBIT_CONSUMER_SECRET);
                         
