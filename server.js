@@ -8,6 +8,7 @@ var multer = require('multer');
 
 var mongoose = require('mongoose');
 var passport = require('passport');
+var partials = require('express-partials');
 
 var app = express();
 
@@ -19,6 +20,7 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(multer());
+app.use(partials());
 app.use(express.static(path.join(__dirname, 'public')));
 
 mongoose.connect(process.env.DATABASE_URL);

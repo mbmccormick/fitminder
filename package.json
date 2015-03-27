@@ -12,6 +12,7 @@
         "passport": "~0.2.1", 
         "passport-fitbit": "~0.1.2",
         "ejs": "~2.3.1",
+        "express-partials": "~0.3.0",
         "fitbit-node": "~0.1.0",
         "twilio": "~1.11.1"
     }

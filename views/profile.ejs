@@ -1,12 +1,30 @@
+<p class="lead">Welcome, <%= user.nickname %>!</p>
+<p>Thanks for signing up for Fitminder. In order for us to send you notifications, we need to know your phone number. We promise not to share it with anyone else.</p>
+
+<br />
+<br />
+
 <form method="post">
-    <p><b>ID: <b><%= user.encodedId %></p>
-    <p><b>Full Name:</b> <%= user.fullName %></p>
-	<p><b>Nickname:</b> <%= user.nickname %></p>
-    <p><b>Timezone:</b> <%= user.timezone %></p>
-    <p><b>Phone Number:</b> <input name="phoneNumber" type="text" value="<%= user.phoneNumber %>" /></p>
-    <p><b>Is Phone Number Verified:</b> <%= user.isPhoneNumberVerified %></p>
-    <p><b>Last Sync Time:</b> <%= user.lastSyncTime %></p>
-    <p><b>Last Notification Time:</b> <%= user.lastNotificationTime %></p>
+    <div class="form-group">
+        <label for="encodedId">Phone Number</label>
+        <input type="tel" class="form-control" id="phoneNumber" value="<%= user.phoneNumber %>">
+        <% if (user.isPhoneNumberVerified) { %>
+        <p class="text-success">Your phone number has been verified.</p>
+        <% } else { %>
+        <p class="text-danger">Your phone number has not yet been verified.</p>
+        <% } %>
+    </div>
+    <div class="form-group">
+        <label for="lastSyncTime">Last Sync Time</label>
+        <input type="text" class="form-control" id="lastSyncTime" value="<%= user.lastSyncTime %>" disabled>
+    </div>
+    <div class="form-group">
+        <label for="lastNotificationTime">Last Notification Time</label>
+        <input type="text" class="form-control" id="lastNotificationTime" value="<%= user.lastNotificationTime %>" disabled>
+    </div>
     
-    <input type="submit">Save</input>
+    <br />
+    <br />
+    
+    <button type="submit" class="btn btn-default btn-lg">Update</button>
 </form>

@@ -10,12 +10,6 @@ module.exports = function(app, passport) {
 
     });
 
-    app.get('/login', function(req, res) {
-
-        res.render('login', { user: req.user });
-
-    });
-
     app.get('/auth/fitbit', passport.authenticate('fitbit'), function(req, res) {
 
         // do nothing
@@ -165,14 +159,14 @@ module.exports = function(app, passport) {
                         // check if user has been sedentary for at least 45 minutes
                         if (sedentaryCount > 3) {
                             var messages = [
-								'Get moving, ' + data.nickname + '! Time to go for a walk.',
-								'Get moving, ' + data.nickname + '! You\'ve been sedentary for quite a while.',
-								'Wake up, ' + data.nickname + '! Time to go for a walk.',
-								'Wake up, ' + data.nickname + '! You\'ve been sedentary for quite a while.'
-							];
-							
-							var index = Math.floor((Math.random() * messages.length));
-							var message = messages[index];
+                                'Get moving, ' + data.nickname + '! Time to go for a walk.',
+                                'Get moving, ' + data.nickname + '! You\'ve been sedentary for quite a while.',
+                                'Wake up, ' + data.nickname + '! Time to go for a walk.',
+                                'Wake up, ' + data.nickname + '! You\'ve been sedentary for quite a while.'
+                            ];
+                            
+                            var index = Math.floor((Math.random() * messages.length));
+                            var message = messages[index];
                             
                             // send a text message to notify the user
                             TwilioApiClient.sendMessage({
@@ -216,5 +210,5 @@ function ensureAuthenticated(req, res, next) {
         return next();
     }
     
-    res.redirect('/login')
+    res.redirect('/')
 }
