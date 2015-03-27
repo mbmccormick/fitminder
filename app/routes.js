@@ -74,11 +74,8 @@ module.exports = function (app, passport) {
 
     app.post('/api/fitbit/notification', function (req, res) {
 
-        // parse the incoming payload
-        var json = JSON.parse(req.body);
-
         // process the individual notifications
-        for (var update in json) {
+        for (var update in req.body) {
             var query = Profile.where({ encodedId: update.ownerId });
 
             // find the user associated with this notification
@@ -103,7 +100,7 @@ module.exports = function (app, passport) {
         }
 
         // acknowledge the notification
-        res.status(204);
+        res.status(204).end();
 
     });
 
