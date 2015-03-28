@@ -184,9 +184,9 @@ module.exports = function(app, passport) {
 
                 data.save();
 
-                // check if it is daytime hours local time
+                // check if it is daytime hours (9:00 am to 8:59 pm)  local time
                 if (moment.utc().tz(data.timezone).hour() >= 9 &&
-                    moment.utc().tz(data.timezone).hour() <= 21) {                
+                    moment.utc().tz(data.timezone).hour() <= 20) {                
                     // check if phone number is verified and last notification was sent at least 2 hours ago
                     if (data.isPhoneNumberVerified &&
                         data.lastNotificationTime < moment.utc().subtract(2, 'hours')) {
