@@ -8,14 +8,8 @@
 <form method="post">
     <div class="form-group">
         <label for="encodedId">Phone Number</label>
-        <input type="tel" class="form-control" id="phoneNumber" value="<%= user.phoneNumber %>">
+        <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber" value=""<%= user.phoneNumber %>">
     </div>
-
-    <% if (user.isPhoneNumberVerified) { %>
-    <p class="text-success">Your phone number has been verified.</p>
-    <% } else { %>
-    <p class="text-danger">Your phone number has not yet been verified.</p>
-    <% } %>
     
     <br />
     

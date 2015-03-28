@@ -8,7 +8,7 @@
 <form method="post">
     <div class="form-group">
         <label for="encodedId">Phone Number</label>
-        <input type="tel" class="form-control" id="phoneNumber" value="<%= user.phoneNumber %>">
+        <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber" value="<%= user.phoneNumber %>">
     </div>
 
     <% if (user.isPhoneNumberVerified) { %>
@@ -25,5 +25,5 @@
     <br />
     <br />
 
-    <p>The last time we last received data from Fitbit for your account was on <strong><%= user.lastSyncTime %></strong>. The last notification was sent to your phone on <strong><%= user.lastNotificationTime %></strong>.</p>
+    <p>The last time we received data from Fitbit for your account was <strong><%= fromNow(user.lastSyncTime) %></strong>. The last notification was sent to your phone <strong><%= fromNow(user.lastNotificationTime) %></strong>.</p>
 </form>

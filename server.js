@@ -1,6 +1,7 @@
 // setup =======================================================================
 var express = require('express');
 var path = require('path');
+var ejs = require('ejs');
 var logger = require('morgan');
 var session = require('express-session');
 var bodyParser = require('body-parser');
@@ -9,6 +10,7 @@ var multer = require('multer');
 var mongoose = require('mongoose');
 var passport = require('passport');
 var partials = require('express-partials');
+var moment = require('moment-timezone');
 
 var app = express();
 
@@ -35,6 +37,10 @@ app.use(session({
 ));
 app.use(passport.initialize());
 app.use(passport.session());
+
+app.locals.fromNow = function (date) {
+    return moment(date).fromNow();
+}
 
 // routes ======================================================================
 require('./app/routes')(app, passport);
