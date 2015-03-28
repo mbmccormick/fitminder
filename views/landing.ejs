@@ -6,18 +6,21 @@
 <br />
 
 <form method="post">
-    <div class="form-group">
+    <div class="form-group form-group-lg">
         <label for="encodedId">Phone Number</label>
-        <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber" value=""<%= user.phoneNumber %>">
+        <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber" value="<%= user.phoneNumber %>">
     </div>
     
+    <% if (user.phoneNumber) { %>
+    <% if (user.isPhoneNumberVerified) { %>
+    <p class="text-success">Your phone number has been verified.</p>
+    <% } else { %>
+    <p class="text-danger">Your phone number has not yet been verified.</p>
+    <% } %>
+    <% } %>
+    
     <br />
     
-    <button type="submit" class="btn btn-default btn-lg">Confirm phone number</button>
+    <button type="submit" class="btn btn-default btn-lg">Save changes</button>
     <br />
-
-    <br />
-    <br />
-
-    <p>The last time we last received data from Fitbit for your account was on <strong><%= user.lastSyncTime %></strong>. The last notification was sent to your phone on <strong><%= user.lastNotificationTime %></strong>.</p>
 </form>

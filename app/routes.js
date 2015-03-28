@@ -1,6 +1,7 @@
 var Profile = require('./models/profile');
 var FitbitApiClient = require('fitbit-node');
 var TwilioApiClient = require('twilio')(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+var phone = require('phone');
 var moment = require('moment-timezone');
 
 module.exports = function(app, passport) {
@@ -45,9 +46,14 @@ module.exports = function(app, passport) {
                 console.log(err);
             }
             
+            var phoneNumber = phone(req.body.phoneNumber, 'USA');
+            if (phoneNumber == null) {
+                // TODO: handle phone number validation failure
+            }
+            
             // check to see if they are changing their phone number
-            if (data.phoneNumber != req.body.phoneNumber) {
-                data.phoneNumber = (req.body.phoneNumber.indexOf('+1', 0) === 0 ? req.body.phoneNumber : '+1' + req.body.phoneNumber);
+            if (data.phoneNumber != phoneNumber[0]) {
+                data.phoneNumber = phoneNumber[0];
                 data.isPhoneNumberVerified = false;
                 
                 data.save();
@@ -77,11 +83,7 @@ module.exports = function(app, passport) {
 
     app.get('/profile/landing', ensureAuthenticated, function (req, res) {
 
-        if (req.user.phoneNumber != null) {
-            res.redirect('/profile');
-        } else {
-            res.render('landing', { user: req.user });
-        }
+        res.render('landing', { user: req.user });
 
     });
 
@@ -96,10 +98,15 @@ module.exports = function(app, passport) {
                 console.log('ERROR: Profile.where.findOne');
                 console.log(err);
             }
+            
+            var phoneNumber = phone(req.body.phoneNumber, 'USA');
+            if (phoneNumber == null) {
+                // TODO: handle phone number validation failure
+            }
 
             // check to see if they are changing their phone number
             if (data.phoneNumber != req.body.phoneNumber) {
-                data.phoneNumber = (req.body.phoneNumber.indexOf('+1', 0) === 0 ? req.body.phoneNumber : '+1' + req.body.phoneNumber);
+                data.phoneNumber = phoneNumber[0];
                 data.isPhoneNumberVerified = false;
 
                 data.save();
@@ -129,7 +136,12 @@ module.exports = function(app, passport) {
     
     app.post('/api/twilio/inbound', function(req, res) {
 
-        var query = Profile.where({ phoneNumber: (req.body.From.indexOf('+1', 0) === 0 ? req.body.From : '+1' + req.body.From) });
+        var phoneNumber = phone(req.body.phoneNumber, 'USA');
+        if (phoneNumber == null) {
+            // TODO: handle phone number validation failure
+        }
+        
+        var query = Profile.where({ phoneNumber: phoneNumber[0] });
 
         // find the user profile associated with this phone number
         query.findOne(function(err, data) {            
@@ -187,9 +199,8 @@ module.exports = function(app, passport) {
                 // check if it is daytime hours (9:00 am to 8:59 pm)  local time
                 if (moment.utc().tz(data.timezone).hour() >= 9 &&
                     moment.utc().tz(data.timezone).hour() <= 20) {                
-                    // check if phone number is verified and last notification was sent at least 2 hours ago
-                    if (data.isPhoneNumberVerified &&
-                        data.lastNotificationTime < moment.utc().subtract(2, 'hours')) {
+                    // check if phone number is verified
+                    if (data.isPhoneNumberVerified) {
                         // connect to the fitbit api
                         var client = new FitbitApiClient(process.env.FITBIT_CONSUMER_KEY, process.env.FITBIT_CONSUMER_SECRET);
                         
@@ -216,7 +227,7 @@ module.exports = function(app, passport) {
                                 }
                             }
                         
-                            // check if user has been sedentary for at least 45 minutes
+                            // check if user has been sedentary for the last 45 minutes
                             if (sedentaryCount > 3) {
                                 var messages = [
                                     'Get moving, ' + data.nickname + '! Time to go for a walk.',
