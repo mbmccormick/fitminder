@@ -13,6 +13,9 @@ var ProfileSchema  = new Schema({
     strideLengthWalking: Number,
     phoneNumber: String,
     isPhoneNumberVerified: Boolean,
+    inactivityThreshold: Number,
+    startTime: Number,
+    endTime: Number,
     lastSyncTime: Date,
     lastNotificationTime: Date
 });

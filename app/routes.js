@@ -73,6 +73,12 @@ module.exports = function(app, passport) {
                 );
             }
             
+            data.inactivityThreshold = req.body.inactivityThreshold;
+            data.startTime = req.body.startTime;
+            data.endTime = req.body.endTime;
+            
+            data.save();
+            
             // update the user's profile currently stored in session
             req.user = data;
         
@@ -125,6 +131,12 @@ module.exports = function(app, passport) {
                     }
                 );
             }
+            
+            data.inactivityThreshold = req.body.inactivityThreshold;
+            data.startTime = req.body.startTime;
+            data.endTime = req.body.endTime;
+            
+            data.save();
 
             // update the user's profile currently stored in session
             req.user = data;
@@ -196,49 +208,49 @@ module.exports = function(app, passport) {
 
                 data.save();
 
-                // check if it is daytime hours (9:00 am to 8:59 pm)  local time
-                if (moment.utc().tz(data.timezone).hour() >= 9 &&
-                    moment.utc().tz(data.timezone).hour() <= 20) {                
-                    // check if phone number is verified
-                    if (data.isPhoneNumberVerified) {
-                        // connect to the fitbit api
-                        var client = new FitbitApiClient(process.env.FITBIT_CONSUMER_KEY, process.env.FITBIT_CONSUMER_SECRET);
-                        
-                        // fetch the user's activity timeseries data
-                        client.requestResource('/activities/calories/date/today/1d/15min.json', 'GET', data.oauthToken, data.oauthTokenSecret).then(function(results) {
-                            if (results[1].statusCode != 200) {
-                                // log errors to console
-                                if (err) {
-                                    console.log('ERROR: FitbitApiClient.requestResource');
-                                    console.log(err);
-                                }
+                // check if it is between the user's specified reminder window
+                if (moment.utc().tz(data.timezone).hour() >= data.startTime &&
+                    moment.utc().tz(data.timezone).hour() < data.endTime) {                
+                    // connect to the fitbit api
+                    var client = new FitbitApiClient(process.env.FITBIT_CONSUMER_KEY, process.env.FITBIT_CONSUMER_SECRET);
+                    
+                    // fetch the user's activity timeseries data
+                    client.requestResource('/activities/calories/date/today/1d/15min.json', 'GET', data.oauthToken, data.oauthTokenSecret).then(function(results) {
+                        if (results[1].statusCode != 200) {
+                            // log errors to console
+                            if (err) {
+                                console.log('ERROR: FitbitApiClient.requestResource');
+                                console.log(err);
                             }
-                        
-                            var payload = JSON.parse(results[0]);
-                        
-                            var sedentaryCount = 0;
-                        
-                            // loop through the timeseries data to find when how long user has been sedentary
-                            for (var j = payload['activities-calories-intraday'].dataset.length - 1; j >= 0; j--) {
-                                if (payload['activities-calories-intraday'].dataset[j].level == 0) {
-                                    sedentaryCount++;
-                                } else {
-                                    break;
-                                }
+                        }
+                    
+                        var payload = JSON.parse(results[0]);
+                    
+                        var sedentaryCount = 0;
+                    
+                        // loop through the timeseries data to find when how long user has been sedentary
+                        for (var j = payload['activities-calories-intraday'].dataset.length - 1; j >= 0; j--) {
+                            if (payload['activities-calories-intraday'].dataset[j].level == 0) {
+                                sedentaryCount++;
+                            } else {
+                                break;
                             }
+                        }
+                    
+                        // check if user has been sedentary for the last 45 minutes
+                        if (sedentaryCount > data.inactivityThreshold) {
+                            var messages = [
+                                'Get moving, ' + data.nickname + '! Time to go for a walk.',
+                                'Get moving, ' + data.nickname + '! You\'ve been sedentary for quite a while.',
+                                'Wake up, ' + data.nickname + '! Time to go for a walk.',
+                                'Wake up, ' + data.nickname + '! You\'ve been sedentary for quite a while.'
+                            ];
                         
-                            // check if user has been sedentary for the last 45 minutes
-                            if (sedentaryCount > 3) {
-                                var messages = [
-                                    'Get moving, ' + data.nickname + '! Time to go for a walk.',
-                                    'Get moving, ' + data.nickname + '! You\'ve been sedentary for quite a while.',
-                                    'Wake up, ' + data.nickname + '! Time to go for a walk.',
-                                    'Wake up, ' + data.nickname + '! You\'ve been sedentary for quite a while.'
-                                ];
-                            
-                                var index = Math.floor((Math.random() * messages.length));
-                                var message = messages[index];
-                            
+                            var index = Math.floor((Math.random() * messages.length));
+                            var message = messages[index];
+                        
+                            // check if phone number is verified
+                            if (data.isPhoneNumberVerified) {
                                 // send a text message to notify the user
                                 TwilioApiClient.sendMessage({
                                         to: data.phoneNumber,
@@ -257,8 +269,8 @@ module.exports = function(app, passport) {
 
                                 data.save();
                             }
-                        });
-                    }
+                        }
+                    });
                 }
             });
         }

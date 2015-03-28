@@ -48,6 +48,9 @@ module.exports = function(passport) {
                     if (created) {
                         data.phoneNumber = null;
                         data.isPhoneNumberVerified = false;
+                        data.inactivityThreshold = 3; // 45 minutes
+                        data.startTime = 9; // 9:00 AM
+                        data.endTime = 21; // 9:00 PM
                         data.lastSyncTime = null;
                         data.lastNotificationTime = null;
                     }
