@@ -240,10 +240,22 @@ module.exports = function(app, passport) {
                         // check if user has been sedentary for the last 45 minutes
                         if (sedentaryCount > data.inactivityThreshold) {
                             var messages = [
-                                'Get moving, ' + data.nickname + '! Time to go for a walk.',
-                                'Get moving, ' + data.nickname + '! You\'ve been sedentary for quite a while.',
-                                'Wake up, ' + data.nickname + '! Time to go for a walk.',
-                                'Wake up, ' + data.nickname + '! You\'ve been sedentary for quite a while.'
+                                'Get up and move, ' + data.nickname + '! Get off your butt and get some steps!',
+                                'Get up and move, ' + data.nickname + '! Go for a short walk and score a few hundred steps.',
+                                'Get up and move, ' + data.nickname + '! It\'s time to go for a walk.',
+                                'Get up and move, ' + data.nickname + '! You\'ve been inactive for quite a while.',
+                                'Hey, ' + data.nickname + '! Get off your butt and get some steps!',
+                                'Hey, ' + data.nickname + '! Go for a short walk and score a few hundred steps.',
+                                'Hey, ' + data.nickname + '! It\'s time to go for a walk.',
+                                'Hey, ' + data.nickname + '! You\'ve been inactive for quite a while.',
+                                'Knock knock, ' + data.nickname + '! Get off your butt and get some steps!',
+                                'Knock knock, ' + data.nickname + '! Go for a short walk and score a few hundred steps.',
+                                'Knock knock, ' + data.nickname + '! It\'s time to go for a walk.',
+                                'Knock knock, ' + data.nickname + '! You\'ve been inactive for quite a while.',
+                                'Wake up, ' + data.nickname + '! Get off your butt and get some steps!',
+                                'Wake up, ' + data.nickname + '! Go for a short walk and score a few hundred steps.',
+                                'Wake up, ' + data.nickname + '! It\'s time to go for a walk.',
+                                'Wake up, ' + data.nickname + '! You\'ve been inactive for quite a while.',
                             ];
                         
                             var index = Math.floor((Math.random() * messages.length));
