@@ -1,7 +1,7 @@
 <br />
 
 <p class="lead">Welcome back, <%= user.nickname %>! We've missed you.</p>
-<p>Thanks for using Fitminder. Below you'll find some information we have associated with your account, including the phone number where we send your reminders. We promise not to share this information with anyone else.</p>
+<p>Thanks for using Fitminder. Below you'll find the phone number we have associated with your account, your Fitminder preferences, and your reminder status history. We promise not to share this information with anyone else.</p>
 
 <br />
 
@@ -20,7 +20,7 @@
     <br />
     
     <div class="form-group form-group-lg">
-        <label class="control-label" for="inactivityThreshold">Remind me when inactive for</label>
+        <label class="control-label" for="inactivityThreshold">Remind me when I've been inactive for</label>
         <select class="form-control" id="inactivityThreshold" name="inactivityThreshold">
             <option value="2" <% if (user.inactivityThreshold == 2) { %>selected<% } %>>30 minutes</option>
             <option value="3" <% if (user.inactivityThreshold == 3) { %>selected<% } %>>45 minutes</option>
@@ -31,7 +31,7 @@
     </div>
     
     <div class="form-group form-group-lg">
-        <label class="control-label" for="startTime">Don't send reminders before</label>
+        <label class="control-label" for="startTime">Don't send me reminders before</label>
         <select class="form-control" id="startTime" name="startTime">
             <option value="7" <% if (user.startTime == 7) { %>selected<% } %>>7:00 AM</option>
             <option value="8" <% if (user.startTime == 8) { %>selected<% } %>>8:00 AM</option>
@@ -42,7 +42,7 @@
     </div>
     
     <div class="form-group form-group-lg">
-        <label class="control-label" for="endTime">Don't send reminders after</label>
+        <label class="control-label" for="endTime">Don't send me reminders after</label>
         <select class="form-control" id="endTime" name="endTime">
             <option value="19" <% if (user.endTime == 19) { %>selected<% } %>>7:00 PM</option>
             <option value="20" <% if (user.endTime == 20) { %>selected<% } %>>8:00 PM</option>
