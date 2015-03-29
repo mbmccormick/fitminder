@@ -208,8 +208,9 @@ module.exports = function(app, passport) {
 
                 data.save();
 
-                // check if it is between the user's specified reminder window
-                if (moment.utc().tz(data.timezone).hour() >= data.startTime &&
+                // check the last notification time and see if we are inside the user's reminder window
+                if (data.lastNotificationTime < moment.utc().subtract(data.inactivityThreshold * 15, 'minutes') &&
+                    moment.utc().tz(data.timezone).hour() >= data.startTime &&
                     moment.utc().tz(data.timezone).hour() < data.endTime) {                
                     // connect to the fitbit api
                     var client = new FitbitApiClient(process.env.FITBIT_CONSUMER_KEY, process.env.FITBIT_CONSUMER_SECRET);
