@@ -1,3 +1,31 @@
+@font-face {
+    font-family: "Proxima Nova Regular";
+    src: url("proximanova-regular.woff") format('woff');
+    font-weight: 400;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "Proxima Nova Light";
+    src: url("proximanova-light.woff") format('woff');
+    font-weight: 400;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "Proxima Nova Bold";
+    src: url("proximanova-bold.woff") format('woff');
+    font-weight: 400;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "Proxima Nova Semibold";
+    src: url("proximanova-semibold.woff") format('woff');
+    font-weight: 400;
+    font-style: normal;
+}
+
 html {
   position: relative;
   min-height: 100%;
@@ -6,7 +34,27 @@ body {
   /* Margin bottom by footer height */
   margin-bottom: 60px;
 }
+a, a:hover, a:active {
+  color: #4ac1c0;
+}
+h1, h2, h3, h5, h6 {
+  font-family: "Proxima Nova Light";
+}
+h4 {
+  font-family: "Proxima Nova Semibold";
+  text-transform: uppercase;
+}
+p.lead {
+  font-family: "Proxima Nova Semibold";
+}
+p.hero {
+  font-size: 120%;
+}
+.btn {
+  font-family: "Proxima Nova Regular";
+}
 .footer {
+  font-family: "Proxima Nova Regular";
   position: absolute;
   bottom: 0;
   width: 100%;
