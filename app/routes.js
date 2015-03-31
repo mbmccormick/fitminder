@@ -198,17 +198,34 @@ module.exports = function(app, passport) {
                 console.log(err);
             }
             
-            // check to see if they correctly verified their number
-            if (req.body.Body.trim().toUpperCase() == 'YES') {
-                data.isPhoneNumberVerified = true;
-                
-                data.save();
-                
+            // check to see if we found a user
+            if (data) {
+                // check to see if they correctly verified their number
+                if (req.body.Body.trim().toLowerCase() == 'yes') {
+                    data.isPhoneNumberVerified = true;
+                    
+                    data.save();
+                    
+                    // send a text message to confirm number verification
+                    TwilioApiClient.sendMessage({
+                            to: data.phoneNumber,
+                            from: process.env.TWILIO_PHONE_NUMBER,
+                            body: 'Awesome. Your phone number has been verified!'
+                        }, function(err, responseData) {
+                            // log errors to console
+                            if (err) {
+                                console.log('ERROR: TwilioApiClient.sendMessage');
+                                console.log(err);
+                            }
+                        }
+                    );
+                }
+            } else {
                 // send a text message to confirm receipt
                 TwilioApiClient.sendMessage({
-                        to: data.phoneNumber,
+                        to: phoneNumber[0],
                         from: process.env.TWILIO_PHONE_NUMBER,
-                        body: 'Awesome. Your phone number has been verified!'
+                        body: 'Hey there! We didn\'t understand your text message. For more information, please visit http://' + process.env.HOSTNAME + '.'
                     }, function(err, responseData) {
                         // log errors to console
                         if (err) {
