@@ -39,7 +39,10 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.locals.fromNow = function (date) {
-    return moment(date).fromNow();
+    if (date)
+        return moment(date).fromNow();
+    else
+        return 'never';
 }
 
 // routes ======================================================================
