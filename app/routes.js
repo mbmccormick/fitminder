@@ -86,6 +86,41 @@ module.exports = function(app, passport) {
         });
 
     });
+    
+    app.get('/profile/delete', ensureAuthenticated, function (req, res) {
+
+        var query = Profile.where({ encodedId: req.user.encodedId });
+
+        // find the current user's profile
+        query.findOne(function(err, data) {            
+            // log errors to console
+            if (err) {
+                console.log('ERROR: Profile.where.findOne');
+                console.log(err);
+            }
+            
+            // connect to the fitbit api
+            var client = new FitbitApiClient(process.env.FITBIT_CONSUMER_KEY, process.env.FITBIT_CONSUMER_SECRET);
+            
+            // delete the subscription for this user
+            client.requestResource('/activities/apiSubscriptions/' + data.encodedId + '.json', 'DELETE', data.oauthToken, data.oauthTokenSecret).then(function(results) {
+                if (results[1].statusCode != 204 ||
+                    results[1].statusCode != 404) {
+                    // log errors to console
+                    if (err) {
+                        console.log('ERROR: FitbitApiClient.requestResource');
+                        console.log(err);
+                    }
+                }
+            });
+            
+            data.remove();
+        });
+        
+        req.logout();
+        res.redirect('/');
+
+    });
 
     app.get('/profile/landing', ensureAuthenticated, function (req, res) {
 
@@ -148,7 +183,7 @@ module.exports = function(app, passport) {
     
     app.post('/api/twilio/inbound', function(req, res) {
 
-        var phoneNumber = phone(req.body.phoneNumber, 'USA');
+        var phoneNumber = phone(req.body.From, 'USA');
         if (phoneNumber == null) {
             // TODO: handle phone number validation failure
         }
@@ -241,18 +276,21 @@ module.exports = function(app, passport) {
                         // check if user has been sedentary for the last 45 minutes
                         if (sedentaryCount > data.inactivityThreshold) {
                             var messages = [
-                                'Get up and move, ' + data.nickname + '! Get off your butt and get some steps!',
+                                'Get up and move, ' + data.nickname + '! Why not go for a short walk?',
                                 'Get up and move, ' + data.nickname + '! Go for a short walk and score a few hundred steps.',
                                 'Get up and move, ' + data.nickname + '! It\'s time to go for a walk.',
                                 'Get up and move, ' + data.nickname + '! You\'ve been inactive for quite a while.',
+                                'Hey, ' + data.nickname + '! Why not go for a short walk?',
                                 'Hey, ' + data.nickname + '! Get off your butt and get some steps!',
                                 'Hey, ' + data.nickname + '! Go for a short walk and score a few hundred steps.',
                                 'Hey, ' + data.nickname + '! It\'s time to go for a walk.',
                                 'Hey, ' + data.nickname + '! You\'ve been inactive for quite a while.',
+                                'Knock knock, ' + data.nickname + '! Why not go for a short walk?',
                                 'Knock knock, ' + data.nickname + '! Get off your butt and get some steps!',
                                 'Knock knock, ' + data.nickname + '! Go for a short walk and score a few hundred steps.',
                                 'Knock knock, ' + data.nickname + '! It\'s time to go for a walk.',
                                 'Knock knock, ' + data.nickname + '! You\'ve been inactive for quite a while.',
+                                'Wake up, ' + data.nickname + '! Why not go for a short walk?',
                                 'Wake up, ' + data.nickname + '! Get off your butt and get some steps!',
                                 'Wake up, ' + data.nickname + '! Go for a short walk and score a few hundred steps.',
                                 'Wake up, ' + data.nickname + '! It\'s time to go for a walk.',

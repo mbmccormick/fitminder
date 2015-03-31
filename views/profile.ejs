@@ -1,6 +1,4 @@
-<br />
-
-<p class="lead">Welcome back, <%= user.nickname %>! We've missed you.</p>
+<p class="lead">Welcome back, <%= user.nickname %>! We missed you.</p>
 <p>Thanks for using Fitminder. Below you'll find the phone number we have associated with your account, your Fitminder preferences, and your reminder status history. We promise not to share this information with anyone else.</p>
 
 <br />
@@ -61,6 +59,10 @@
     <br />
 
     <p>The last time we received data from Fitbit for your account was <strong><%= fromNow(user.lastSyncTime) %></strong>. The last notification was sent to your phone <strong><%= fromNow(user.lastNotificationTime) %></strong>.</p>
+    
+    <br />
+    
+    <p>Ready to give up? You can <a class="text-danger" href="/profile/delete" onclick="return confirm('Are you sure you want to delete your account?');">delete your account</a> if you really want to.</p>
 </form>
 
 <script type="text/javascript">
