@@ -16,6 +16,7 @@ var ProfileSchema  = new Schema({
     inactivityThreshold: Number,
     startTime: Number,
     endTime: Number,
+    dontSendRemindersAfterGoal: Boolean,
     lastSyncTime: Date,
     lastNotificationTime: Date
 });

@@ -323,7 +323,7 @@ module.exports = function(app, passport) {
                                     var payload = JSON.parse(results[0]);
                                     
                                     // check if user has met step goal for today
-                                    if (payload.summary.steps < payload.goals.step) {
+                                    if (payload.summary.steps < payload.goals.steps) {
                                         var messages = [
                                             'Get up and move, ' + data.nickname + '! Why not go for a short walk?',
                                             'Get up and move, ' + data.nickname + '! Go for a short walk and score a few hundred steps.',
