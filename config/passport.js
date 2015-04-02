@@ -1,7 +1,7 @@
 var FitbitStrategy = require('passport-fitbit').Strategy;
 
 var Profile = require('../app/models/profile');
-var FitbitApiClient = require('fitbit-node');
+var fitbit = require('../app/fitbit');
 
 module.exports = function(passport) {
 
@@ -58,20 +58,8 @@ module.exports = function(passport) {
                     
                     data.save();
                 
-                    // connect to the fitbit api
-                    var client = new FitbitApiClient(process.env.FITBIT_CONSUMER_KEY, process.env.FITBIT_CONSUMER_SECRET);
-                    
-                    // ensure that we have a subscription for this user
-                    client.requestResource('/activities/apiSubscriptions/' + data.encodedId + '.json', 'POST', data.oauthToken, data.oauthTokenSecret).then(function(results) {
-                        if (results[1].statusCode != 200 ||
-                            results[1].statusCode != 201) {
-                            // log errors to console
-                            if (err) {
-                                console.log('ERROR: FitbitApiClient.requestResource');
-                                console.log(err);
-                            }
-                        }
-                    });
+                    // create a subscription for the user
+                    fitbit.createSubscription(data);
                     
                     return done(null, data);
                 });

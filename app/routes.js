@@ -1,6 +1,7 @@
 var Profile = require('./models/profile');
-var FitbitApiClient = require('fitbit-node');
-var TwilioApiClient = require('twilio')(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+var fitbit = require('./fitbit');
+var twilio = require('./twilio');
+
 var phone = require('phone');
 var moment = require('moment-timezone');
 
@@ -59,18 +60,7 @@ module.exports = function(app, passport) {
                 data.save();
                 
                 // send a text message to confirm the phone number
-                TwilioApiClient.sendMessage({
-                        to: data.phoneNumber,
-                        from: process.env.TWILIO_PHONE_NUMBER,
-                        body: 'Hey, ' + data.nickname + '! Thanks for updating your phone number with Fitminder. Please reply \"yes\" to confirm your new number.'
-                    }, function(err, responseData) { 
-                        // log errors to console
-                        if (err) {
-                            console.log('ERROR: TwilioApiClient.sendMessage');
-                            console.log(err);
-                        }
-                    }
-                );
+                twilio.sendMessage(data.phoneNumber, 'Hey, ' + data.nickname + '! Thanks for updating your phone number with Fitminder. Please reply \"yes\" to confirm your new number.');
             }
             
             data.inactivityThreshold = req.body.inactivityThreshold;
@@ -88,7 +78,7 @@ module.exports = function(app, passport) {
 
     });
     
-    app.get('/profile/delete', ensureAuthenticated, function (req, res) {
+    app.get('/profile/delete', ensureAuthenticated, function(req, res) {
 
         var query = Profile.where({ encodedId: req.user.encodedId });
 
@@ -100,20 +90,8 @@ module.exports = function(app, passport) {
                 console.log(err);
             }
             
-            // connect to the fitbit api
-            var client = new FitbitApiClient(process.env.FITBIT_CONSUMER_KEY, process.env.FITBIT_CONSUMER_SECRET);
-            
             // delete the subscription for this user
-            client.requestResource('/activities/apiSubscriptions/' + data.encodedId + '.json', 'DELETE', data.oauthToken, data.oauthTokenSecret).then(function(results) {
-                if (results[1].statusCode != 204 ||
-                    results[1].statusCode != 404) {
-                    // log errors to console
-                    if (err) {
-                        console.log('ERROR: FitbitApiClient.requestResource');
-                        console.log(err);
-                    }
-                }
-            });
+            fitbit.deleteSubscription(data);
             
             data.remove();
         });
@@ -123,18 +101,18 @@ module.exports = function(app, passport) {
 
     });
 
-    app.get('/profile/landing', ensureAuthenticated, function (req, res) {
+    app.get('/profile/landing', ensureAuthenticated, function(req, res) {
 
         res.render('landing', { user: req.user });
 
     });
 
-    app.post('/profile/landing', ensureAuthenticated, function (req, res) {
+    app.post('/profile/landing', ensureAuthenticated, function(req, res) {
 
         var query = Profile.where({ encodedId: req.user.encodedId });
 
         // find the current user's profile
-        query.findOne(function (err, data) {
+        query.findOne(function(err, data) {
             // log errors to console
             if (err) {
                 console.log('ERROR: Profile.where.findOne');
@@ -154,18 +132,7 @@ module.exports = function(app, passport) {
                 data.save();
 
                 // send a text message to confirm the phone number
-                TwilioApiClient.sendMessage({
-                        to: data.phoneNumber,
-                        from: process.env.TWILIO_PHONE_NUMBER,
-                        body: 'Hey, ' + data.nickname + '! Thanks for signing up for Fitminder. Please reply \"yes\" to confirm your phone number.'
-                    }, function (err, responseData) {
-                        // log errors to console
-                        if (err) {
-                            console.log('ERROR: TwilioApiClient.sendMessage');
-                            console.log(err);
-                        }
-                    }
-                );
+                twilio.sendMessage(data.phoneNumber, 'Hey, ' + data.nickname + '! Thanks for signing up for Fitminder. Please reply \"yes\" to confirm your phone number.');
             }
             
             data.inactivityThreshold = req.body.inactivityThreshold;
@@ -209,47 +176,14 @@ module.exports = function(app, passport) {
                     data.save();
                     
                     // send a text message to confirm number verification
-                    TwilioApiClient.sendMessage({
-                            to: data.phoneNumber,
-                            from: process.env.TWILIO_PHONE_NUMBER,
-                            body: 'Awesome. Your phone number has been verified!'
-                        }, function(err, responseData) {
-                            // log errors to console
-                            if (err) {
-                                console.log('ERROR: TwilioApiClient.sendMessage');
-                                console.log(err);
-                            }
-                        }
-                    );
+                    twilio.sendMessage(data.phoneNumber, 'Awesome. Your phone number has been verified!');
                 } else {
                     // send a text message to confirm receipt
-                    TwilioApiClient.sendMessage({
-                            to: phoneNumber[0],
-                            from: process.env.TWILIO_PHONE_NUMBER,
-                            body: 'Hey there! We didn\'t understand your text message. For more information, please visit http://' + process.env.HOSTNAME + '.'
-                        }, function(err, responseData) {
-                            // log errors to console
-                            if (err) {
-                                console.log('ERROR: TwilioApiClient.sendMessage');
-                                console.log(err);
-                            }
-                        }
-                    );
+                    twilio.sendMessage(phoneNumber[0], 'Hey there! We didn\'t understand your text message. For more information, please visit http://' + process.env.HOSTNAME + '.');
                 }
             } else {
                 // send a text message to confirm receipt
-                TwilioApiClient.sendMessage({
-                        to: phoneNumber[0],
-                        from: process.env.TWILIO_PHONE_NUMBER,
-                        body: 'Hey there! We didn\'t understand your text message. For more information, please visit http://' + process.env.HOSTNAME + '.'
-                    }, function(err, responseData) {
-                        // log errors to console
-                        if (err) {
-                            console.log('ERROR: TwilioApiClient.sendMessage');
-                            console.log(err);
-                        }
-                    }
-                );
+                twilio.sendMessage(phoneNumber[0], 'Hey there! We didn\'t understand your text message. For more information, please visit http://' + process.env.HOSTNAME + '.');
             }
         });
 
@@ -280,146 +214,55 @@ module.exports = function(app, passport) {
                 if (data.lastNotificationTime < moment.utc().subtract(data.inactivityThreshold * 15, 'minutes') &&
                     moment.utc().tz(data.timezone).hour() >= data.startTime &&
                     moment.utc().tz(data.timezone).hour() < data.endTime) {                
-                    // connect to the fitbit api
-                    var client = new FitbitApiClient(process.env.FITBIT_CONSUMER_KEY, process.env.FITBIT_CONSUMER_SECRET);
-                    
                     // fetch the user's activity timeseries data
-                    client.requestResource('/activities/calories/date/today/1d/15min.json', 'GET', data.oauthToken, data.oauthTokenSecret).then(function(results) {
-                        if (results[1].statusCode != 200) {
-                            // log errors to console
-                            if (err) {
-                                console.log('ERROR: FitbitApiClient.requestResource');
-                                console.log(err);
-                            }
+                    var timeseries = fitbit.getTimeseries(data);
+                    
+                    var sedentaryCount = 0;
+                    
+                    // loop through the timeseries data to find when how long user has been sedentary
+                    for (var j = timeseries['activities-calories-intraday'].dataset.length - 1; j >= 0; j--) {
+                        if (timeseries['activities-calories-intraday'].dataset[j].level == 0) {
+                            sedentaryCount++;
+                        } else {
+                            break;
                         }
+                    }
                     
-                        var payload = JSON.parse(results[0]);
-                    
-                        var sedentaryCount = 0;
-                    
-                        // loop through the timeseries data to find when how long user has been sedentary
-                        for (var j = payload['activities-calories-intraday'].dataset.length - 1; j >= 0; j--) {
-                            if (payload['activities-calories-intraday'].dataset[j].level == 0) {
-                                sedentaryCount++;
-                            } else {
-                                break;
-                            }
-                        }
-                    
-                        // check if user has been sedentary for the last 45 minutes
-                        if (sedentaryCount > data.inactivityThreshold) {
-                            // check if we need to check for the user's step goal
-                            if (data.dontSendRemindersAfterGoal) {
-                                // fetch the user's stats for today
-                                client.requestResource('/activities/date/today.json', 'GET', data.oauthToken, data.oauthTokenSecret).then(function(results) {
-                                    if (results[1].statusCode != 200) {
-                                        // log errors to console
-                                        if (err) {
-                                            console.log('ERROR: FitbitApiClient.requestResource');
-                                            console.log(err);
-                                        }
-                                    }
-                                
-                                    var payload = JSON.parse(results[0]);
+                    // check if user has been sedentary for the last 45 minutes
+                    if (sedentaryCount > data.inactivityThreshold) {
+                        // check if we need to check for the user's step goal
+                        if (data.dontSendRemindersAfterGoal) {
+                            // fetch the user's stats for today
+                            var activities = fitbit.getActivities(data);
                                     
-                                    // check if user has met step goal for today
-                                    if (payload.summary.steps < payload.goals.steps) {
-                                        var messages = [
-                                            'Get up and move, ' + data.nickname + '! Why not go for a short walk?',
-                                            'Get up and move, ' + data.nickname + '! Go for a short walk and score a few hundred steps.',
-                                            'Get up and move, ' + data.nickname + '! It\'s time to go for a walk.',
-                                            'Get up and move, ' + data.nickname + '! You\'ve been inactive for quite a while.',
-                                            'Hey, ' + data.nickname + '! Why not go for a short walk?',
-                                            'Hey, ' + data.nickname + '! Get off your butt and get some steps!',
-                                            'Hey, ' + data.nickname + '! Go for a short walk and score a few hundred steps.',
-                                            'Hey, ' + data.nickname + '! It\'s time to go for a walk.',
-                                            'Hey, ' + data.nickname + '! You\'ve been inactive for quite a while.',
-                                            'Knock knock, ' + data.nickname + '! Why not go for a short walk?',
-                                            'Knock knock, ' + data.nickname + '! Get off your butt and get some steps!',
-                                            'Knock knock, ' + data.nickname + '! Go for a short walk and score a few hundred steps.',
-                                            'Knock knock, ' + data.nickname + '! It\'s time to go for a walk.',
-                                            'Knock knock, ' + data.nickname + '! You\'ve been inactive for quite a while.',
-                                            'Wake up, ' + data.nickname + '! Why not go for a short walk?',
-                                            'Wake up, ' + data.nickname + '! Get off your butt and get some steps!',
-                                            'Wake up, ' + data.nickname + '! Go for a short walk and score a few hundred steps.',
-                                            'Wake up, ' + data.nickname + '! It\'s time to go for a walk.',
-                                            'Wake up, ' + data.nickname + '! You\'ve been inactive for quite a while.',
-                                        ];
+                            // check if user has met step goal for today
+                            if (activities.summary.steps < activities.goals.steps) {
+                                var reminder = generateReminder(data);
                                     
-                                        var index = Math.floor((Math.random() * messages.length));
-                                        var message = messages[index];
-                                    
-                                        // check if phone number is verified
-                                        if (data.isPhoneNumberVerified) {
-                                            // send a text message to notify the user
-                                            TwilioApiClient.sendMessage({
-                                                    to: data.phoneNumber,
-                                                    from: process.env.TWILIO_PHONE_NUMBER,
-                                                    body: message
-                                                }, function(err, responseData) {
-                                                    // log errors to console
-                                                    if (err) {
-                                                        console.log('ERROR: TwilioApiClient.sendMessage');
-                                                        console.log(err);
-                                                    }
-                                                }
-                                            );
-                                        
-                                            data.lastNotificationTime = moment.utc();
-
-                                            data.save();
-                                        }
-                                    }
-                                });
-                            } else {
-                                var messages = [
-                                    'Get up and move, ' + data.nickname + '! Why not go for a short walk?',
-                                    'Get up and move, ' + data.nickname + '! Go for a short walk and score a few hundred steps.',
-                                    'Get up and move, ' + data.nickname + '! It\'s time to go for a walk.',
-                                    'Get up and move, ' + data.nickname + '! You\'ve been inactive for quite a while.',
-                                    'Hey, ' + data.nickname + '! Why not go for a short walk?',
-                                    'Hey, ' + data.nickname + '! Get off your butt and get some steps!',
-                                    'Hey, ' + data.nickname + '! Go for a short walk and score a few hundred steps.',
-                                    'Hey, ' + data.nickname + '! It\'s time to go for a walk.',
-                                    'Hey, ' + data.nickname + '! You\'ve been inactive for quite a while.',
-                                    'Knock knock, ' + data.nickname + '! Why not go for a short walk?',
-                                    'Knock knock, ' + data.nickname + '! Get off your butt and get some steps!',
-                                    'Knock knock, ' + data.nickname + '! Go for a short walk and score a few hundred steps.',
-                                    'Knock knock, ' + data.nickname + '! It\'s time to go for a walk.',
-                                    'Knock knock, ' + data.nickname + '! You\'ve been inactive for quite a while.',
-                                    'Wake up, ' + data.nickname + '! Why not go for a short walk?',
-                                    'Wake up, ' + data.nickname + '! Get off your butt and get some steps!',
-                                    'Wake up, ' + data.nickname + '! Go for a short walk and score a few hundred steps.',
-                                    'Wake up, ' + data.nickname + '! It\'s time to go for a walk.',
-                                    'Wake up, ' + data.nickname + '! You\'ve been inactive for quite a while.',
-                                ];
-                            
-                                var index = Math.floor((Math.random() * messages.length));
-                                var message = messages[index];
-                            
                                 // check if phone number is verified
                                 if (data.isPhoneNumberVerified) {
                                     // send a text message to notify the user
-                                    TwilioApiClient.sendMessage({
-                                            to: data.phoneNumber,
-                                            from: process.env.TWILIO_PHONE_NUMBER,
-                                            body: message
-                                        }, function(err, responseData) {
-                                            // log errors to console
-                                            if (err) {
-                                                console.log('ERROR: TwilioApiClient.sendMessage');
-                                                console.log(err);
-                                            }
-                                        }
-                                    );
-                                
+                                    twilio.sendMessage(data.phoneNumber, reminder);
+                                        
                                     data.lastNotificationTime = moment.utc();
 
                                     data.save();
                                 }
                             }
+                        } else {
+                            var reminder = generateReminder(data);
+                            
+                            // check if phone number is verified
+                            if (data.isPhoneNumberVerified) {
+                                // send a text message to notify the user
+                                twilio.sendMessage(data.phoneNumber, reminder);
+                                
+                                data.lastNotificationTime = moment.utc();
+
+                                data.save();
+                            }
                         }
-                    });
+                    }
                 }
             });
         }
@@ -444,4 +287,37 @@ function ensureAuthenticated(req, res, next) {
     }
     
     res.redirect('/')
+}
+
+function generateGreeting(profile) {
+    var greetings = [
+        'Get up and move, ' + profile.nickname + '!',
+        'Hey, ' + profile.nickname + '!',
+        'Knock knock, ' + profile.nickname + '!',
+        'Wake up, ' + profile.nickname + '!'
+    ];
+
+    var index = Math.floor((Math.random() * greetings.length));
+
+    return greetings[index];
+}
+
+function generateMessage(profile) {
+    var messages = [
+        'Why not go for a short walk?',
+        'Go for a short walk and score a few hundred steps.',
+        'It\'s time to go for a walk.',
+        'You\'ve been inactive for quite a while.',
+        'Get off your butt and get some steps!'
+    ];
+
+    var index = Math.floor((Math.random() * messages.length));
+
+    return messages[index];
+}
+
+function generateReminder(profile) {
+    var reminder = generateGreeting(profile) + ' ' + generateMessage(profile);
+
+    return reminder;
 }
