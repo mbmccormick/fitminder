@@ -308,50 +308,115 @@ module.exports = function(app, passport) {
                     
                         // check if user has been sedentary for the last 45 minutes
                         if (sedentaryCount > data.inactivityThreshold) {
-                            var messages = [
-                                'Get up and move, ' + data.nickname + '! Why not go for a short walk?',
-                                'Get up and move, ' + data.nickname + '! Go for a short walk and score a few hundred steps.',
-                                'Get up and move, ' + data.nickname + '! It\'s time to go for a walk.',
-                                'Get up and move, ' + data.nickname + '! You\'ve been inactive for quite a while.',
-                                'Hey, ' + data.nickname + '! Why not go for a short walk?',
-                                'Hey, ' + data.nickname + '! Get off your butt and get some steps!',
-                                'Hey, ' + data.nickname + '! Go for a short walk and score a few hundred steps.',
-                                'Hey, ' + data.nickname + '! It\'s time to go for a walk.',
-                                'Hey, ' + data.nickname + '! You\'ve been inactive for quite a while.',
-                                'Knock knock, ' + data.nickname + '! Why not go for a short walk?',
-                                'Knock knock, ' + data.nickname + '! Get off your butt and get some steps!',
-                                'Knock knock, ' + data.nickname + '! Go for a short walk and score a few hundred steps.',
-                                'Knock knock, ' + data.nickname + '! It\'s time to go for a walk.',
-                                'Knock knock, ' + data.nickname + '! You\'ve been inactive for quite a while.',
-                                'Wake up, ' + data.nickname + '! Why not go for a short walk?',
-                                'Wake up, ' + data.nickname + '! Get off your butt and get some steps!',
-                                'Wake up, ' + data.nickname + '! Go for a short walk and score a few hundred steps.',
-                                'Wake up, ' + data.nickname + '! It\'s time to go for a walk.',
-                                'Wake up, ' + data.nickname + '! You\'ve been inactive for quite a while.',
-                            ];
-                        
-                            var index = Math.floor((Math.random() * messages.length));
-                            var message = messages[index];
-                        
-                            // check if phone number is verified
-                            if (data.isPhoneNumberVerified) {
-                                // send a text message to notify the user
-                                TwilioApiClient.sendMessage({
-                                        to: data.phoneNumber,
-                                        from: process.env.TWILIO_PHONE_NUMBER,
-                                        body: message
-                                    }, function(err, responseData) {
+                            // check if we need to check for the user's step goal
+                            if (data.dontSendRemindersAfterGoal) {
+                                // fetch the user's stats for today
+                                client.requestResource('/activities/date/today.json', 'GET', data.oauthToken, data.oauthTokenSecret).then(function(results) {
+                                    if (results[1].statusCode != 200) {
                                         // log errors to console
                                         if (err) {
-                                            console.log('ERROR: TwilioApiClient.sendMessage');
+                                            console.log('ERROR: FitbitApiClient.requestResource');
                                             console.log(err);
                                         }
                                     }
-                                );
-                            
-                                data.lastNotificationTime = moment.utc();
+                                
+                                    var payload = JSON.parse(results[0]);
+                                    
+                                    // check if user has met step goal for today
+                                    if (payload.summary.steps < payload.goals.step) {
+                                        var messages = [
+                                            'Get up and move, ' + data.nickname + '! Why not go for a short walk?',
+                                            'Get up and move, ' + data.nickname + '! Go for a short walk and score a few hundred steps.',
+                                            'Get up and move, ' + data.nickname + '! It\'s time to go for a walk.',
+                                            'Get up and move, ' + data.nickname + '! You\'ve been inactive for quite a while.',
+                                            'Hey, ' + data.nickname + '! Why not go for a short walk?',
+                                            'Hey, ' + data.nickname + '! Get off your butt and get some steps!',
+                                            'Hey, ' + data.nickname + '! Go for a short walk and score a few hundred steps.',
+                                            'Hey, ' + data.nickname + '! It\'s time to go for a walk.',
+                                            'Hey, ' + data.nickname + '! You\'ve been inactive for quite a while.',
+                                            'Knock knock, ' + data.nickname + '! Why not go for a short walk?',
+                                            'Knock knock, ' + data.nickname + '! Get off your butt and get some steps!',
+                                            'Knock knock, ' + data.nickname + '! Go for a short walk and score a few hundred steps.',
+                                            'Knock knock, ' + data.nickname + '! It\'s time to go for a walk.',
+                                            'Knock knock, ' + data.nickname + '! You\'ve been inactive for quite a while.',
+                                            'Wake up, ' + data.nickname + '! Why not go for a short walk?',
+                                            'Wake up, ' + data.nickname + '! Get off your butt and get some steps!',
+                                            'Wake up, ' + data.nickname + '! Go for a short walk and score a few hundred steps.',
+                                            'Wake up, ' + data.nickname + '! It\'s time to go for a walk.',
+                                            'Wake up, ' + data.nickname + '! You\'ve been inactive for quite a while.',
+                                        ];
+                                    
+                                        var index = Math.floor((Math.random() * messages.length));
+                                        var message = messages[index];
+                                    
+                                        // check if phone number is verified
+                                        if (data.isPhoneNumberVerified) {
+                                            // send a text message to notify the user
+                                            TwilioApiClient.sendMessage({
+                                                    to: data.phoneNumber,
+                                                    from: process.env.TWILIO_PHONE_NUMBER,
+                                                    body: message
+                                                }, function(err, responseData) {
+                                                    // log errors to console
+                                                    if (err) {
+                                                        console.log('ERROR: TwilioApiClient.sendMessage');
+                                                        console.log(err);
+                                                    }
+                                                }
+                                            );
+                                        
+                                            data.lastNotificationTime = moment.utc();
 
-                                data.save();
+                                            data.save();
+                                        }
+                                    }
+                                });
+                            } else {
+                                var messages = [
+                                    'Get up and move, ' + data.nickname + '! Why not go for a short walk?',
+                                    'Get up and move, ' + data.nickname + '! Go for a short walk and score a few hundred steps.',
+                                    'Get up and move, ' + data.nickname + '! It\'s time to go for a walk.',
+                                    'Get up and move, ' + data.nickname + '! You\'ve been inactive for quite a while.',
+                                    'Hey, ' + data.nickname + '! Why not go for a short walk?',
+                                    'Hey, ' + data.nickname + '! Get off your butt and get some steps!',
+                                    'Hey, ' + data.nickname + '! Go for a short walk and score a few hundred steps.',
+                                    'Hey, ' + data.nickname + '! It\'s time to go for a walk.',
+                                    'Hey, ' + data.nickname + '! You\'ve been inactive for quite a while.',
+                                    'Knock knock, ' + data.nickname + '! Why not go for a short walk?',
+                                    'Knock knock, ' + data.nickname + '! Get off your butt and get some steps!',
+                                    'Knock knock, ' + data.nickname + '! Go for a short walk and score a few hundred steps.',
+                                    'Knock knock, ' + data.nickname + '! It\'s time to go for a walk.',
+                                    'Knock knock, ' + data.nickname + '! You\'ve been inactive for quite a while.',
+                                    'Wake up, ' + data.nickname + '! Why not go for a short walk?',
+                                    'Wake up, ' + data.nickname + '! Get off your butt and get some steps!',
+                                    'Wake up, ' + data.nickname + '! Go for a short walk and score a few hundred steps.',
+                                    'Wake up, ' + data.nickname + '! It\'s time to go for a walk.',
+                                    'Wake up, ' + data.nickname + '! You\'ve been inactive for quite a while.',
+                                ];
+                            
+                                var index = Math.floor((Math.random() * messages.length));
+                                var message = messages[index];
+                            
+                                // check if phone number is verified
+                                if (data.isPhoneNumberVerified) {
+                                    // send a text message to notify the user
+                                    TwilioApiClient.sendMessage({
+                                            to: data.phoneNumber,
+                                            from: process.env.TWILIO_PHONE_NUMBER,
+                                            body: message
+                                        }, function(err, responseData) {
+                                            // log errors to console
+                                            if (err) {
+                                                console.log('ERROR: TwilioApiClient.sendMessage');
+                                                console.log(err);
+                                            }
+                                        }
+                                    );
+                                
+                                    data.lastNotificationTime = moment.utc();
+
+                                    data.save();
+                                }
                             }
                         }
                     });
