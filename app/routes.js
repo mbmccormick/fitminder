@@ -76,6 +76,7 @@ module.exports = function(app, passport) {
             data.inactivityThreshold = req.body.inactivityThreshold;
             data.startTime = req.body.startTime;
             data.endTime = req.body.endTime;
+            data.dontSendRemindersAfterGoal = req.body.dontSendRemindersAfterGoal ? true : false;
             
             data.save();
             
@@ -170,6 +171,7 @@ module.exports = function(app, passport) {
             data.inactivityThreshold = req.body.inactivityThreshold;
             data.startTime = req.body.startTime;
             data.endTime = req.body.endTime;
+            data.dontSendRemindersAfterGoal = req.body.dontSendRemindersAfterGoal ? true : false;
             
             data.save();
 

@@ -51,6 +51,7 @@ module.exports = function(passport) {
                         data.inactivityThreshold = 4; // 1 hour
                         data.startTime = 9; // 9:00 AM
                         data.endTime = 21; // 9:00 PM
+                        data.dontSendRemindersAfterGoal = false;
                         data.lastSyncTime = null;
                         data.lastNotificationTime = null;
                     }

@@ -22,11 +22,11 @@
     <div class="form-group form-group-lg">
         <label class="control-label" for="inactivityThreshold">Remind me when I've been inactive for</label>
         <select class="form-control" id="inactivityThreshold" name="inactivityThreshold">
-            <option value="2" <% if (user.inactivityThreshold == 2) { %>selected<% } %>>30 minutes</option>
-            <option value="3" <% if (user.inactivityThreshold == 3) { %>selected<% } %>>45 minutes</option>
-            <option value="4" <% if (user.inactivityThreshold == 4) { %>selected<% } %>>1 hour</option>
-            <option value="5" <% if (user.inactivityThreshold == 5) { %>selected<% } %>>1 hour, 15 minutes</option>
-            <option value="6" <% if (user.inactivityThreshold == 6) { %>selected<% } %>>1 hour, 30 minutes</option>
+            <option value="2"<% if (user.inactivityThreshold == 2) { %>selected<% } %>>30 minutes</option>
+            <option value="3"<% if (user.inactivityThreshold == 3) { %>selected<% } %>>45 minutes</option>
+            <option value="4"<% if (user.inactivityThreshold == 4) { %>selected<% } %>>1 hour</option>
+            <option value="5"<% if (user.inactivityThreshold == 5) { %>selected<% } %>>1 hour, 15 minutes</option>
+            <option value="6"<% if (user.inactivityThreshold == 6) { %>selected<% } %>>1 hour, 30 minutes</option>
         </select>
     </div>
     
@@ -44,12 +44,18 @@
     <div class="form-group form-group-lg">
         <label class="control-label" for="endTime">Don't send me reminders after</label>
         <select class="form-control" id="endTime" name="endTime">
-            <option value="19" <% if (user.endTime == 19) { %>selected<% } %>>7:00 PM</option>
-            <option value="20" <% if (user.endTime == 20) { %>selected<% } %>>8:00 PM</option>
-            <option value="21" <% if (user.endTime == 21) { %>selected<% } %>>9:00 PM</option>
-            <option value="22" <% if (user.endTime == 22) { %>selected<% } %>>10:00 PM</option>
-            <option value="23" <% if (user.endTime == 23) { %>selected<% } %>>11:00 PM</option>
+            <option value="19"<% if (user.endTime == 19) { %>selected<% } %>>7:00 PM</option>
+            <option value="20"<% if (user.endTime == 20) { %>selected<% } %>>8:00 PM</option>
+            <option value="21"<% if (user.endTime == 21) { %>selected<% } %>>9:00 PM</option>
+            <option value="22"<% if (user.endTime == 22) { %>selected<% } %>>10:00 PM</option>
+            <option value="23"<% if (user.endTime == 23) { %>selected<% } %>>11:00 PM</option>
         </select>
+    </div>
+    
+    <div class="checkbox">
+        <label>
+            <input type="checkbox" id="dontSendRemindersAfterGoal" name="dontSendRemindersAfterGoal"<% if (user.dontSendRemindersAfterGoal) { %>checked<% } %>> <span>Don't send me reminders after I've met my step goal</span>
+        </label>
     </div>
     
     <br />
