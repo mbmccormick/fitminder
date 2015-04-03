@@ -65,11 +65,11 @@
 </form>
 
 <script type="text/javascript">
+    var verification = $("#phoneVerificationStatus");
+    
     var form = $("form");
     var target = $("#phoneNumber");
     var parent = $(target).closest('.form-group');
-    
-    var verification = $("#phoneVerificationStatus");
     
     target.intlTelInput({
         utilsScript: "/js/jquery.intltelinput.extra.min.js"
@@ -85,8 +85,6 @@
     });
     
     target.blur(function() {
-        verification.hide();
-        
         if ($.trim(target.val())) {
             if (target.intlTelInput("isValidNumber")) {
                 parent.removeClass('has-error');
@@ -99,6 +97,8 @@
     });
 
     target.keydown(function() {
+        verification.hide();
+        
         parent.removeClass('has-error');
         $("#phoneValidationError").remove();
     });

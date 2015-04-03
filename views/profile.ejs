@@ -70,15 +70,15 @@
     
     <br />
     
-    <p>Ready to give up? You can <a class="text-danger" href="/profile/delete" onclick="return confirm('Are you sure you want to delete your account?');">delete your account</a> if you really want to.</p>
+    <p>Looking to give up? You can <a class="text-danger" href="/profile/delete" onclick="return confirm('Are you sure you want to delete your account?');">delete your account</a> if you really want to.</p>
 </form>
 
 <script type="text/javascript">
+    var verification = $("#phoneVerificationStatus");
+    
     var form = $("form");
     var target = $("#phoneNumber");
     var parent = $(target).closest('.form-group');
-    
-    var verification = $("#phoneVerificationStatus");
     
     target.intlTelInput({
         utilsScript: "/js/jquery.intltelinput.extra.min.js"
@@ -94,8 +94,6 @@
     });
     
     target.blur(function() {
-        verification.hide();
-        
         if ($.trim(target.val())) {
             if (target.intlTelInput("isValidNumber")) {
                 parent.removeClass('has-error');
@@ -108,6 +106,8 @@
     });
 
     target.keydown(function() {
+        verification.hide();
+        
         parent.removeClass('has-error');
         $("#phoneValidationError").remove();
     });

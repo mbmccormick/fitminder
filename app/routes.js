@@ -47,7 +47,7 @@ module.exports = function(app, passport) {
                 console.log(err);
             }
             
-            var phoneNumber = phone(req.body.phoneNumber, 'USA');
+            var phoneNumber = phone(req.body.phoneNumber);
             if (phoneNumber == null) {
                 // TODO: handle phone number validation failure
             }
@@ -119,7 +119,7 @@ module.exports = function(app, passport) {
                 console.log(err);
             }
             
-            var phoneNumber = phone(req.body.phoneNumber, 'USA');
+            var phoneNumber = phone(req.body.phoneNumber);
             if (phoneNumber == null) {
                 // TODO: handle phone number validation failure
             }
@@ -152,7 +152,7 @@ module.exports = function(app, passport) {
     
     app.post('/api/twilio/inbound', function(req, res) {
 
-        var phoneNumber = phone(req.body.From, 'USA');
+        var phoneNumber = phone(req.body.From);
         if (phoneNumber == null) {
             // TODO: handle phone number validation failure
         }
