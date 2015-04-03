@@ -213,56 +213,56 @@ module.exports = function(app, passport) {
                 // check the last notification time and see if we are inside the user's reminder window
                 if (data.lastNotificationTime < moment.utc().subtract(data.inactivityThreshold * 15, 'minutes') &&
                     moment.utc().tz(data.timezone).hour() >= data.startTime &&
-                    moment.utc().tz(data.timezone).hour() < data.endTime) {                
+                    moment.utc().tz(data.timezone).hour() < data.endTime) {
                     // fetch the user's activity timeseries data
-                    var timeseries = fitbit.getTimeseries(data);
-                    
-                    var sedentaryCount = 0;
-                    
-                    // loop through the timeseries data to find when how long user has been sedentary
-                    for (var j = timeseries['activities-calories-intraday'].dataset.length - 1; j >= 0; j--) {
-                        if (timeseries['activities-calories-intraday'].dataset[j].level == 0) {
-                            sedentaryCount++;
-                        } else {
-                            break;
+                    fitbit.getTimeseries(data).then(function(timeseries) {
+                        var sedentaryCount = 0;
+
+                        // loop through the timeseries data to find when how long user has been sedentary
+                        for (var j = timeseries['activities-calories-intraday'].dataset.length - 1; j >= 0; j--) {
+                            if (timeseries['activities-calories-intraday'].dataset[j].level == 0) {
+                                sedentaryCount++;
+                            } else {
+                                break;
+                            }
                         }
-                    }
-                    
-                    // check if user has been sedentary for the last 45 minutes
-                    if (sedentaryCount > data.inactivityThreshold) {
-                        // check if we need to check for the user's step goal
-                        if (data.dontSendRemindersAfterGoal) {
-                            // fetch the user's stats for today
-                            var activities = fitbit.getActivities(data);
-                                    
-                            // check if user has met step goal for today
-                            if (activities.summary.steps < activities.goals.steps) {
+
+                        // check if user has been sedentary for the last 45 minutes
+                        if (sedentaryCount > data.inactivityThreshold) {
+                            // check if we need to check for the user's step goal
+                            if (data.dontSendRemindersAfterGoal) {
+                                // fetch the user's stats for today
+                                fitbit.getActivities(data).then(function(activities) {                                        
+                                    // check if user has met step goal for today
+                                    if (activities.summary.steps < activities.goals.steps) {
+                                        var reminder = generateReminder(data);
+
+                                        // check if phone number is verified
+                                        if (data.isPhoneNumberVerified) {
+                                            // send a text message to notify the user
+                                            twilio.sendMessage(data.phoneNumber, reminder);
+
+                                            data.lastNotificationTime = moment.utc();
+
+                                            data.save();
+                                        }
+                                    }
+                                });
+                            } else {
                                 var reminder = generateReminder(data);
-                                    
+
                                 // check if phone number is verified
                                 if (data.isPhoneNumberVerified) {
                                     // send a text message to notify the user
                                     twilio.sendMessage(data.phoneNumber, reminder);
-                                        
+
                                     data.lastNotificationTime = moment.utc();
 
                                     data.save();
                                 }
                             }
-                        } else {
-                            var reminder = generateReminder(data);
-                            
-                            // check if phone number is verified
-                            if (data.isPhoneNumberVerified) {
-                                // send a text message to notify the user
-                                twilio.sendMessage(data.phoneNumber, reminder);
-                                
-                                data.lastNotificationTime = moment.utc();
-
-                                data.save();
-                            }
                         }
-                    }
+                    });
                 }
             });
         }
