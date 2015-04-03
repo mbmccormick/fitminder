@@ -6,14 +6,14 @@
 <form method="post">
     <div class="form-group form-group-lg">
         <label class="control-label" for="encodedId">Phone Number</label>
-        <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber" value="<%= user.phoneNumber %>" phoneUS="true" required>
+        <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber" value="<%= user.phoneNumber %>">
     </div>
     
     <% if (user.phoneNumber) { %>
     <% if (user.isPhoneNumberVerified) { %>
-    <p class="text-success">Your phone number has been verified.</p>
+    <p id="phoneVerificationStatus" class="text-success">Your phone number has been verified.</p>
     <% } else { %>
-    <p class="text-danger">Your phone number has not yet been verified.</p>
+    <p id="phoneVerificationStatus" class="text-danger">Your phone number has not yet been verified.</p>
     <% } %>
     <% } %>
     
@@ -65,25 +65,41 @@
 </form>
 
 <script type="text/javascript">
-    $("form").validate({
-        highlight: function(element) {
-            $(element).closest('.form-group').addClass('has-error');
-        },
-        unhighlight: function(element) {
-            $(element).closest('.form-group').removeClass('has-error');
-        },
-        errorElement: 'span',
-        errorClass: 'help-block',
-        errorPlacement: function(error, element) {
-            if(element.parent('.input-group').length) {
-                error.insertAfter(element.parent());
-            } else {
-                error.insertAfter(element);
-            }
+    var form = $("form");
+    var target = $("#phoneNumber");
+    var parent = $(target).closest('.form-group');
+    
+    var verification = $("#phoneVerificationStatus");
+    
+    target.intlTelInput({
+        utilsScript: "/js/jquery.intltelinput.extra.min.js"
+    });
+    
+    form.submit(function() {
+        if ($.trim(target.val()) == 0) {
+            parent.addClass('has-error');
+            parent.after("<p id=\"phoneValidationError\" class=\"text-danger\">This is a required field.</p>");
+            
+            return false;
         }
     });
     
-    $("#phoneNumber").intlTelInput({
-        utilsScript: "/js/jquery.intltelinput.extra.min.js"
+    target.blur(function() {
+        verification.hide();
+        
+        if ($.trim(target.val())) {
+            if (target.intlTelInput("isValidNumber")) {
+                parent.removeClass('has-error');
+                $("#phoneValidationError").remove();
+            } else {
+                parent.addClass('has-error');
+                parent.after("<p id=\"phoneValidationError\" class=\"text-danger\">This is not a valid phone number.</p>");
+            }
+        }
+    });
+
+    target.keydown(function() {
+        parent.removeClass('has-error');
+        $("#phoneValidationError").remove();
     });
 </script>
