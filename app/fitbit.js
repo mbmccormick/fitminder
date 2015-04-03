@@ -41,7 +41,7 @@ exports.deleteSubscription = function(profile) {
 exports.getTimeseries = function(profile) {
     var client = new FitbitApiClient(process.env.FITBIT_CONSUMER_KEY, process.env.FITBIT_CONSUMER_SECRET);
 
-    client.requestResource('/activities/calories/date/today/1d/15min.json', 'GET', data.oauthToken, data.oauthTokenSecret).then(function(results) {
+    client.requestResource('/activities/calories/date/today/1d/15min.json', 'GET', profile.oauthToken, profile.oauthTokenSecret).then(function(results) {
         if (results[1].statusCode != 200) {
             // log errors to console
             if (err) {
@@ -59,7 +59,7 @@ exports.getTimeseries = function(profile) {
 exports.getActivities = function(profile) {
     var client = new FitbitApiClient(process.env.FITBIT_CONSUMER_KEY, process.env.FITBIT_CONSUMER_SECRET);
 
-    client.requestResource('/activities/date/today.json', 'GET', data.oauthToken, data.oauthTokenSecret).then(function(results) {
+    client.requestResource('/activities/date/today.json', 'GET', profile.oauthToken, profile.oauthTokenSecret).then(function(results) {
         if (results[1].statusCode != 200) {
             // log errors to console
             if (err) {
