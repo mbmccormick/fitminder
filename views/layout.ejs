@@ -42,7 +42,7 @@
         </footer>
 		
 		<script type="text/javascript">
-			$.getJSON("/api/messages"), function(data) {
+			$.getJSON("/api/messages", function(data) {
 				if (data.messages.success) {
 					for (var message in data.messages.success) {
 						alert("SUCCESS: " + message[1]);
