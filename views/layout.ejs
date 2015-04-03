@@ -40,6 +40,34 @@
                 <p class="text-muted">Hand-forged in Seattle by <a href="http://mbmccormick.com">Matt McCormick</a></p>
             </div>
         </footer>
+		
+		<script type="text/javascript">
+			$.getJSON("/api/messages"), function(data) {
+				if (data.messages.success) {
+					for (var message in data.messages.success) {
+						alert("SUCCESS: " + message[1]);
+					}
+				}
+				
+				if (data.messages.error) {
+					for (var message in data.messages.error) {
+						alert("ERROR: " + message[1]);
+					}
+				}
+				
+				if (data.messages.warning) {
+					for (var message in data.messages.warning) {
+						alert("WARNING: " + message[1]);
+					}
+				}
+				
+				if (data.messages.info) {
+					for (var message in data.messages.info) {
+						alert("INFO: " + message[1]);
+					}
+				}
+			});
+		</script>
 
     </body>
 </html>

@@ -49,7 +49,7 @@ module.exports = function(app, passport) {
             
             var phoneNumber = phone(req.body.phoneNumber);
             if (phoneNumber == null) {
-                // TODO: handle phone number validation failure
+                req.flash('error', 'Phone number could not be converted to E.164 format.');
             }
             
             // check to see if they are changing their phone number
@@ -94,6 +94,8 @@ module.exports = function(app, passport) {
             fitbit.deleteSubscription(data);
             
             data.remove();
+			
+			req.flash('success', 'Your account has been deleted. We\'re sorry to see you go.');
         });
         
         req.logout();
@@ -121,7 +123,7 @@ module.exports = function(app, passport) {
             
             var phoneNumber = phone(req.body.phoneNumber);
             if (phoneNumber == null) {
-                // TODO: handle phone number validation failure
+                req.flash('error', 'Phone number could not be converted to E.164 format.');
             }
 
             // check to see if they are changing their phone number
@@ -133,6 +135,8 @@ module.exports = function(app, passport) {
 
                 // send a text message to confirm the phone number
                 twilio.sendMessage(data.phoneNumber, 'Hey, ' + data.nickname + '! Thanks for signing up for Fitminder. Please reply \"yes\" to confirm your phone number.');
+				
+				req.flash('info', 'We just sent you a text message to verify your phone number.');
             }
             
             data.inactivityThreshold = req.body.inactivityThreshold;
@@ -149,12 +153,23 @@ module.exports = function(app, passport) {
         });
 
     });
+	
+	app.get('/api/messages', function(req, res) {
+
+        res.json({ messages: {
+			success: req.flash('success'),
+			error: req.flash('error'),
+			warning: req.flash('warning'),
+			info: req.flash('info')
+		}});
+
+    });
     
     app.post('/api/twilio/inbound', function(req, res) {
 
         var phoneNumber = phone(req.body.From);
         if (phoneNumber == null) {
-            // TODO: handle phone number validation failure
+            req.flash('error', 'Phone number could not be converted to E.164 format.');
         }
         
         var query = Profile.where({ phoneNumber: phoneNumber[0] });
