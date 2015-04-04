@@ -65,41 +65,43 @@
 </form>
 
 <script type="text/javascript">
-    var verification = $("#phoneVerificationStatus");
-    
-    var form = $("form");
-    var target = $("#phoneNumber");
-    var parent = $(target).closest('.form-group');
-    
-    target.intlTelInput({
-        utilsScript: "/js/jquery.intltelinput.extra.min.js"
-    });
-    
-    form.submit(function() {
-        if ($.trim(target.val()) == 0) {
-            parent.addClass('has-error');
-            parent.after("<p id=\"phoneValidationError\" class=\"text-danger\">This is a required field.</p>");
-            
-            return false;
-        }
-    });
-    
-    target.blur(function() {
-        if ($.trim(target.val())) {
-            if (target.intlTelInput("isValidNumber")) {
-                parent.removeClass('has-error');
-                $("#phoneValidationError").remove();
-            } else {
-                parent.addClass('has-error');
-                parent.after("<p id=\"phoneValidationError\" class=\"text-danger\">This is not a valid phone number.</p>");
-            }
-        }
-    });
-
-    target.keydown(function() {
-        verification.hide();
+    $(document).ready(function() {
+        var verification = $("#phoneVerificationStatus");
         
-        parent.removeClass('has-error');
-        $("#phoneValidationError").remove();
+        var form = $("form");
+        var target = $("#phoneNumber");
+        var parent = $(target).closest('.form-group');
+        
+        target.intlTelInput({
+            utilsScript: "/js/jquery.intltelinput.extra.min.js"
+        });
+        
+        form.submit(function() {
+            if ($.trim(target.val()) == 0) {
+                parent.addClass('has-error');
+                parent.after("<p id=\"phoneValidationError\" class=\"text-danger\">This is a required field.</p>");
+                
+                return false;
+            }
+        });
+        
+        target.blur(function() {
+            if ($.trim(target.val())) {
+                if (target.intlTelInput("isValidNumber")) {
+                    parent.removeClass('has-error');
+                    $("#phoneValidationError").remove();
+                } else {
+                    parent.addClass('has-error');
+                    parent.after("<p id=\"phoneValidationError\" class=\"text-danger\">This is not a valid phone number.</p>");
+                }
+            }
+        });
+
+        target.keydown(function() {
+            verification.hide();
+            
+            parent.removeClass('has-error');
+            $("#phoneValidationError").remove();
+        });
     });
 </script>

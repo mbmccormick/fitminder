@@ -3,7 +3,6 @@ var express = require('express');
 var path = require('path');
 var logger = require('morgan');
 var session = require('express-session');
-var flash = require('connect-flash');
 var ejs = require('ejs');
 var partials = require('express-partials');
 var bodyParser = require('body-parser');
@@ -38,8 +37,6 @@ app.use(session({
 ));
 app.use(passport.initialize());
 app.use(passport.session());
-
-app.use(flash());
 
 app.locals.fromNow = function (date) {
     if (date)
