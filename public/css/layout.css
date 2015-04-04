@@ -19,6 +19,14 @@ p.lead {
 .container .text-muted {
   margin: 26px 0;
 }
+.spacer {
+}
+.spacer-lg {
+  height: 50px;
+}
+.spacer-sm {
+  height: 25px;
+}
 .checkbox {
   margin: 40px 0px 20px 0px;
 }
@@ -39,4 +47,20 @@ p.lead {
 }
 .footer a {
   color: #666666;  
+}
+@media screen and (max-width:767px) {
+  h1 small {
+    display: none;
+  }
+  .page-header {
+    margin: 0px 0px 15px;
+  }
+  .spacer {
+  }
+  .spacer-lg {
+    height: 20px;
+  }
+  .spacer-sm {
+    height: 10px;
+  }
 }
