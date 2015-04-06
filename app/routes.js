@@ -49,7 +49,7 @@ module.exports = function(app, passport) {
             
             var phoneNumber = phone(req.body.phoneNumber);
             if (phoneNumber == null) {
-                // TODO: handle phone number validation errors
+                console.log('ERROR: Failed to validate phone number ' + req.body.phoneNumber);
             }
             
             // check to see if they are changing their phone number
@@ -121,7 +121,7 @@ module.exports = function(app, passport) {
             
             var phoneNumber = phone(req.body.phoneNumber);
             if (phoneNumber == null) {
-                // TODO: handle phone number validation errors
+                console.log('ERROR: Failed to validate phone number ' + req.body.phoneNumber);
             }
 
             // check to see if they are changing their phone number
@@ -154,7 +154,7 @@ module.exports = function(app, passport) {
 
         var phoneNumber = phone(req.body.From);
         if (phoneNumber == null) {
-            // TODO: handle phone number validation errors
+            console.log('ERROR: Failed to validate phone number ' + req.body.From);
         }
         
         var query = Profile.where({ phoneNumber: phoneNumber[0] });
