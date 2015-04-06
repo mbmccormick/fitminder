@@ -47,6 +47,10 @@ app.locals.fromNow = function (date) {
         return 'never';
 }
 
+// routes ======================================================================
+require('./app/routes')(app, passport);
+
+// error handling ==============================================================
 var raygunClient = new raygun.Client().init({ apiKey: process.env.RAYGUN_APIKEY });
 
 raygunClient.user = function (req) {
@@ -56,9 +60,6 @@ raygunClient.user = function (req) {
 }
 
 app.use(raygunClient.expressHandler);
-
-// routes ======================================================================
-require('./app/routes')(app, passport);
 
 // listen ======================================================================
 app.listen(app.get('port'), function() {
