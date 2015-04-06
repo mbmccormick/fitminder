@@ -12,6 +12,8 @@ var mongoose = require('mongoose');
 var passport = require('passport');
 var moment = require('moment-timezone');
 
+var raygun = require('raygun');
+
 var app = express();
 
 // configuration ===============================================================
@@ -44,6 +46,16 @@ app.locals.fromNow = function (date) {
     else
         return 'never';
 }
+
+var raygunClient = new raygun.Client().init({ apiKey: process.env.RAYGUN_APIKEY });
+
+raygunClient.user = function (req) {
+    if (req.user) {
+        return req.user.encodedId;
+    }
+}
+
+app.use(raygunClient.expressHandler);
 
 // routes ======================================================================
 require('./app/routes')(app, passport);
