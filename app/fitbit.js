@@ -6,8 +6,7 @@ exports.createSubscription = function(profile) {
     return client.requestResource('/activities/apiSubscriptions/' + profile.encodedId + '.json', 'POST', profile.oauthToken, profile.oauthTokenSecret).then(function(results) {
         if (results[1].statusCode != 200 ||
             results[1].statusCode != 201) {
-            // log errors to console
-            console.log('ERROR: fitbit.createSubscription');
+            throw new Error('Failed to create Fitbit subscription');
         }
 
         var payload = JSON.parse(results[0]);
@@ -22,8 +21,7 @@ exports.deleteSubscription = function(profile) {
     return client.requestResource('/activities/apiSubscriptions/' + profile.encodedId + '.json', 'DELETE', profile.oauthToken, profile.oauthTokenSecret).then(function(results) {
         if (results[1].statusCode != 204 ||
             results[1].statusCode != 404) {
-            // log errors to console
-            console.log('ERROR: fitbit.deleteSubscription');
+            throw new Error('Failed to delete Fitbit subscription');
         }
 
         var payload = JSON.parse(results[0]);
@@ -37,8 +35,7 @@ exports.getTimeseries = function(profile) {
 
     return client.requestResource('/activities/calories/date/today/1d/15min.json', 'GET', profile.oauthToken, profile.oauthTokenSecret).then(function(results) {
         if (results[1].statusCode != 200) {
-            // log errors to console
-            console.log('ERROR: fitbit.getTimeseries');
+            throw new Error('Failed to retrieve Fitbit timeseries data');
         }
 
         var payload = JSON.parse(results[0]);
@@ -52,8 +49,7 @@ exports.getActivities = function(profile) {
 
     return client.requestResource('/activities/date/today.json', 'GET', profile.oauthToken, profile.oauthTokenSecret).then(function(results) {
         if (results[1].statusCode != 200) {
-            // log errors to console
-            console.log('ERROR: fitbit.getActivities');
+            throw new Error('Failed to retrieve Fitbit activity stats');
         }
 
         var payload = JSON.parse(results[0]);

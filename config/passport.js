@@ -11,10 +11,8 @@ module.exports = function(passport) {
 
     passport.deserializeUser(function(id, done) {
         Profile.findById(id, function(err, profile) {
-            // log errors to console
             if (err) {
-                console.log('ERROR: Profile.findById');
-                console.log(err);
+                throw err;
             }
             
             done(err, profile);
@@ -31,10 +29,8 @@ module.exports = function(passport) {
 
                 // look up user's profile in database or create one if they don't exist
                 Profile.findOrCreate({ encodedId: profile.id }, function(err, data, created) {
-                    // log errors to console
                     if (err) {
-                        console.log('ERROR: Profile.findOrCreate');
-                        console.log(err);
+                        throw err;
                     }
                     
                     data.oauthToken = token;

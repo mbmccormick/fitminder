@@ -41,15 +41,13 @@ module.exports = function(app, passport) {
 
         // find the current user's profile
         query.findOne(function(err, data) {            
-            // log errors to console
             if (err) {
-                console.log('ERROR: Profile.where.findOne');
-                console.log(err);
+                throw err;
             }
             
             var phoneNumber = phone(req.body.phoneNumber);
             if (phoneNumber == null) {
-                console.log('ERROR: Failed to validate phone number ' + req.body.phoneNumber);
+                throw new Error('Failed to validate phone number ' + req.body.phoneNumber);
             }
             
             // check to see if they are changing their phone number
@@ -84,10 +82,8 @@ module.exports = function(app, passport) {
 
         // find the current user's profile
         query.findOne(function(err, data) {            
-            // log errors to console
             if (err) {
-                console.log('ERROR: Profile.where.findOne');
-                console.log(err);
+                throw err;
             }
             
             // delete the subscription for this user
@@ -113,15 +109,13 @@ module.exports = function(app, passport) {
 
         // find the current user's profile
         query.findOne(function(err, data) {
-            // log errors to console
             if (err) {
-                console.log('ERROR: Profile.where.findOne');
-                console.log(err);
+                throw err;
             }
             
             var phoneNumber = phone(req.body.phoneNumber);
             if (phoneNumber == null) {
-                console.log('ERROR: Failed to validate phone number ' + req.body.phoneNumber);
+                throw new Error('Failed to validate phone number ' + req.body.phoneNumber);
             }
 
             // check to see if they are changing their phone number
@@ -154,17 +148,15 @@ module.exports = function(app, passport) {
 
         var phoneNumber = phone(req.body.From);
         if (phoneNumber == null) {
-            console.log('ERROR: Failed to validate phone number ' + req.body.From);
+            throw new Error('Failed to validate phone number ' + req.body.From);
         }
         
         var query = Profile.where({ phoneNumber: phoneNumber[0] });
 
         // find the user profile associated with this phone number
         query.findOne(function(err, data) {            
-            // log errors to console
             if (err) {
-                console.log('ERROR: Profile.where.findOne');
-                console.log(err);
+                throw err;
             }
             
             // check to see if we found a user
@@ -200,10 +192,8 @@ module.exports = function(app, passport) {
 
             // find the user associated with this notification
             query.findOne(function(err, data) {
-                // log errors to console
                 if (err) {
-                    console.log('ERROR: Profile.where.findOne');
-                    console.log(err);
+                    throw err;
                 }
                 
                 data.lastSyncTime = moment.utc();
