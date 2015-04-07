@@ -42,11 +42,13 @@ module.exports = function(app, passport) {
         // find the current user's profile
         query.findOne(function(err, data) {            
             if (err) {
+                console.log('Failed to retrieve data for query ' + query);
                 throw err;
             }
             
             var phoneNumber = phone(req.body.phoneNumber);
             if (phoneNumber == null) {
+				console.log('Failed to validate phone number ' + req.body.phoneNumber);
                 throw new Error('Failed to validate phone number ' + req.body.phoneNumber);
             }
             
@@ -56,6 +58,8 @@ module.exports = function(app, passport) {
                 data.isPhoneNumberVerified = false;
                 
                 data.save();
+				
+				console.log('Sending phone number verification message for ' + data.encodedId);
                 
                 // send a text message to confirm the phone number
                 twilio.sendMessage(data.phoneNumber, 'Hey, ' + data.nickname + '! Thanks for updating your phone number with Fitminder. Please reply \"yes\" to confirm your new number.');
@@ -83,6 +87,7 @@ module.exports = function(app, passport) {
         // find the current user's profile
         query.findOne(function(err, data) {            
             if (err) {
+                console.log('Failed to retrieve data for query ' + query);
                 throw err;
             }
             
@@ -110,11 +115,13 @@ module.exports = function(app, passport) {
         // find the current user's profile
         query.findOne(function(err, data) {
             if (err) {
+				console.log('Failed to retrieve data for query ' + query);
                 throw err;
             }
             
             var phoneNumber = phone(req.body.phoneNumber);
             if (phoneNumber == null) {
+				console.log('Failed to validate phone number ' + req.body.phoneNumber);
                 throw new Error('Failed to validate phone number ' + req.body.phoneNumber);
             }
 
@@ -124,6 +131,8 @@ module.exports = function(app, passport) {
                 data.isPhoneNumberVerified = false;
 
                 data.save();
+				
+				console.log('Sending phone number verification message for ' + data.encodedId);
 
                 // send a text message to confirm the phone number
                 twilio.sendMessage(data.phoneNumber, 'Hey, ' + data.nickname + '! Thanks for signing up for Fitminder. Please reply \"yes\" to confirm your phone number.');
@@ -148,7 +157,8 @@ module.exports = function(app, passport) {
 
         var phoneNumber = phone(req.body.From);
         if (phoneNumber == null) {
-            throw new Error('Failed to validate phone number ' + req.body.From);
+            console.log('Failed to validate phone number ' + req.body.From);
+			throw new Error('Failed to validate phone number ' + req.body.From);
         }
         
         var query = Profile.where({ phoneNumber: phoneNumber[0] });
@@ -156,6 +166,7 @@ module.exports = function(app, passport) {
         // find the user profile associated with this phone number
         query.findOne(function(err, data) {            
             if (err) {
+                console.log('Failed to retrieve data for query ' + query);
                 throw err;
             }
             
@@ -193,7 +204,8 @@ module.exports = function(app, passport) {
             // find the user associated with this notification
             query.findOne(function(err, data) {
                 if (err) {
-                    throw err;
+                    console.log('Failed to retrieve data for query ' + query);
+					throw err;
                 }
                 
                 data.lastSyncTime = moment.utc();
@@ -229,6 +241,8 @@ module.exports = function(app, passport) {
 
                                         // check if phone number is verified
                                         if (data.isPhoneNumberVerified) {
+											console.log('Sending inactivity reminder for ' + data.encodedId);
+											
                                             // send a text message to notify the user
                                             twilio.sendMessage(data.phoneNumber, reminder);
 
@@ -243,7 +257,9 @@ module.exports = function(app, passport) {
 
                                 // check if phone number is verified
                                 if (data.isPhoneNumberVerified) {
-                                    // send a text message to notify the user
+                                    console.log('Sending inactivity reminder for ' + data.encodedId);
+									
+									// send a text message to notify the user
                                     twilio.sendMessage(data.phoneNumber, reminder);
 
                                     data.lastNotificationTime = moment.utc();
