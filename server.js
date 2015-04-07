@@ -2,7 +2,7 @@
 var express = require('express');
 var path = require('path');
 var logger = require('morgan');
-var session = require('express-session');
+var session = require('cookie-session');
 var ejs = require('ejs');
 var partials = require('express-partials');
 var bodyParser = require('body-parser');
@@ -32,9 +32,9 @@ mongoose.connect(process.env.DATABASE_URL);
 require('./config/passport')(passport);
 
 app.use(session({
+        secret: 'fitminder',
         resave: true,
-        saveUninitialized: true,
-        secret: 'fitminder'
+        saveUninitialized: true
     }
 ));
 app.use(passport.initialize());
