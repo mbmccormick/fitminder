@@ -6,7 +6,7 @@ exports.createSubscription = function(profile) {
     var client = new FitbitApiClient(process.env.FITBIT_CONSUMER_KEY, process.env.FITBIT_CONSUMER_SECRET);
 
     return client.requestResource('/activities/apiSubscriptions/' + profile.encodedId + '.json', 'POST', profile.oauthToken, profile.oauthTokenSecret).then(function(results) {
-        if (results[1].statusCode != 200 ||
+        if (results[1].statusCode != 200 &&
             results[1].statusCode != 201) {
 			console.log('Failed');
             throw new Error('Failed to create Fitbit subscription');
@@ -26,7 +26,7 @@ exports.deleteSubscription = function(profile) {
     var client = new FitbitApiClient(process.env.FITBIT_CONSUMER_KEY, process.env.FITBIT_CONSUMER_SECRET);
 
     return client.requestResource('/activities/apiSubscriptions/' + profile.encodedId + '.json', 'DELETE', profile.oauthToken, profile.oauthTokenSecret).then(function(results) {
-        if (results[1].statusCode != 204 ||
+        if (results[1].statusCode != 204 &&
             results[1].statusCode != 404) {
             console.log('Failed');
             throw new Error('Failed to delete Fitbit subscription');
