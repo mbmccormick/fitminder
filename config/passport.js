@@ -42,8 +42,8 @@ module.exports = function(passport) {
                     
                     // if this is a new user, set some additional defaults
                     if (created) {
-						console.log('Creating user account for' + profile.id);
-						
+                        console.log('Creating user account for' + profile.id);
+                        
                         data.phoneNumber = null;
                         data.isPhoneNumberVerified = false;
                         data.inactivityThreshold = 4; // 1 hour
@@ -53,8 +53,8 @@ module.exports = function(passport) {
                         data.lastSyncTime = null;
                         data.lastNotificationTime = null;
                     } else {
-						console.log('New dashboard session for' + profile.id);
-					}
+                        console.log('New dashboard session for' + profile.id);
+                    }
                     
                     data.save();
                 
