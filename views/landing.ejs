@@ -5,10 +5,10 @@
 
 <form method="post">
     <div class="form-group form-group-lg">
-        <label class="control-label" for="encodedId">Phone Number</label>
+        <label class="control-label" for="phoneNumber">Phone Number</label>
         <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber" value="<%= user.phoneNumber %>">
     </div>
-    
+
     <% if (user.phoneNumber) { %>
     <% if (user.isPhoneNumberVerified) { %>
     <p id="phoneVerificationStatus" class="text-success">Your phone number has been verified.</p>
@@ -16,9 +16,9 @@
     <p id="phoneVerificationStatus" class="text-danger">Your phone number has not yet been verified.</p>
     <% } %>
     <% } %>
-    
+
     <div class="spacer spacer-sm"></div>
-    
+
     <div class="form-group form-group-lg">
         <label class="control-label" for="inactivityThreshold">Remind me when I've been inactive for</label>
         <select class="form-control" id="inactivityThreshold" name="inactivityThreshold">
@@ -29,7 +29,7 @@
             <option value="6"<% if (user.inactivityThreshold == 6) { %>selected<% } %>>1 hour, 30 minutes</option>
         </select>
     </div>
-    
+
     <div class="form-group form-group-lg">
         <label class="control-label" for="startTime">Don't send me reminders before</label>
         <select class="form-control" id="startTime" name="startTime">
@@ -40,7 +40,7 @@
             <option value="11" <% if (user.startTime == 11) { %>selected<% } %>>11:00 AM</option>
         </select>
     </div>
-    
+
     <div class="form-group form-group-lg">
         <label class="control-label" for="endTime">Don't send me reminders after</label>
         <select class="form-control" id="endTime" name="endTime">
@@ -51,19 +51,19 @@
             <option value="23"<% if (user.endTime == 23) { %>selected<% } %>>11:00 PM</option>
         </select>
     </div>
-    
+
     <div class="checkbox">
         <label>
             <input type="checkbox" id="dontSendRemindersAfterGoal" name="dontSendRemindersAfterGoal"<% if (user.dontSendRemindersAfterGoal) { %>checked<% } %>> <span>Don't send me reminders after I've met my step goal</span>
         </label>
     </div>
-    
+
     <div class="spacer spacer-sm"></div>
-    
+
     <button type="submit" class="btn btn-default btn-lg">Save changes</button>
     <br />
 </form>
-    
+
 <div class="spacer spacer-lg"></div>
 
 <h4>Don't forget to set up all-day sync!</h4>
@@ -72,24 +72,24 @@
 <script type="text/javascript">
     $(document).ready(function() {
         var verification = $("#phoneVerificationStatus");
-        
+
         var form = $("form");
         var target = $("#phoneNumber");
         var parent = $(target).closest('.form-group');
-        
+
         target.intlTelInput({
             utilsScript: "/js/jquery.intltelinput.extra.min.js"
         });
-        
+
         form.submit(function() {
             if ($.trim(target.val()) == 0) {
                 parent.addClass('has-error');
                 parent.after("<p id=\"phoneValidationError\" class=\"text-danger\">This is a required field.</p>");
-                
+
                 return false;
             }
         });
-        
+
         target.blur(function() {
             if ($.trim(target.val())) {
                 if (target.intlTelInput("isValidNumber")) {
@@ -104,7 +104,7 @@
 
         target.keydown(function() {
             verification.hide();
-            
+
             parent.removeClass('has-error');
             $("#phoneValidationError").remove();
         });
