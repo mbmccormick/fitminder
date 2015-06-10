@@ -1,4 +1,4 @@
-var FitbitStrategy = require('passport-fitbit').Strategy;
+var FitbitStrategy = require('passport-fitbit2').Strategy;
 
 var Profile = require('../app/models/profile');
 var fitbit = require('../app/fitbit');
