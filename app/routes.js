@@ -126,7 +126,7 @@ module.exports = function(app, passport) {
             }
 
             // check to see if they are changing their phone number
-            if (data.phoneNumber != req.body.phoneNumber) {
+            if (data.phoneNumber != phoneNumber[0]) {
                 data.phoneNumber = phoneNumber[0];
                 data.isPhoneNumberVerified = false;
 
