@@ -47,7 +47,8 @@ module.exports = function(app, passport) {
             }
             
             var phoneNumber = phone(req.body.phoneNumber);
-            if (phoneNumber == null) {
+            if (phoneNumber == null ||
+                phoneNumber[0] == null) {
                 console.log('Failed to validate phone number ' + req.body.phoneNumber);
                 throw new Error('Failed to validate phone number ' + req.body.phoneNumber);
             }
@@ -120,7 +121,8 @@ module.exports = function(app, passport) {
             }
             
             var phoneNumber = phone(req.body.phoneNumber);
-            if (phoneNumber == null) {
+            if (phoneNumber == null ||
+                phoneNumber[0] == null) {
                 console.log('Failed to validate phone number ' + req.body.phoneNumber);
                 throw new Error('Failed to validate phone number ' + req.body.phoneNumber);
             }
@@ -156,7 +158,8 @@ module.exports = function(app, passport) {
     app.post('/api/twilio/inbound', function(req, res) {
 
         var phoneNumber = phone(req.body.From);
-        if (phoneNumber == null) {
+        if (phoneNumber == null ||
+            phoneNumber[0] == null) {
             console.log('Failed to validate phone number ' + req.body.From);
             throw new Error('Failed to validate phone number ' + req.body.From);
         }
