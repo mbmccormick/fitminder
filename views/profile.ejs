@@ -91,6 +91,8 @@
 
                 return false;
             }
+            
+            $("#phoneNumber").val($("#phoneNumber").intlTelInput("getNumber"));
         });
 
         target.blur(function() {
