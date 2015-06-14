@@ -88,6 +88,8 @@
 
                 return false;
             }
+            
+            $("#phoneNumber").val($("#phoneNumber").intlTelInput("getNumber"));
         });
 
         target.blur(function() {
@@ -100,8 +102,6 @@
                     parent.after("<p id=\"phoneValidationError\" class=\"text-danger\">This is not a valid phone number.</p>");
                 }
             }
-            
-            $("#phoneNumber").val($("#phoneNumber").intlTelInput("getNumber"));
         });
 
         target.keydown(function() {
