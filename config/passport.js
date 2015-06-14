@@ -11,10 +11,6 @@ module.exports = function(passport) {
 
     passport.deserializeUser(function(id, done) {
         Profile.findById(id, function(err, profile) {
-            if (err) {
-                throw err;
-            }
-            
             done(err, profile);
         });
     });
@@ -30,7 +26,7 @@ module.exports = function(passport) {
                 // look up user's profile in database or create one if they don't exist
                 Profile.findOrCreate({ encodedId: profile.id }, function(err, data, created) {
                     if (err) {
-                        throw err;
+                        return done(err);
                     }
                     
                     data.oauthToken = token;
@@ -59,7 +55,7 @@ module.exports = function(passport) {
                     data.save();
                 
                     // create a subscription for the user
-                    fitbit.createSubscription(data);
+                    fitbit.createSubscription(data, done);
                     
                     return done(null, data);
                 });

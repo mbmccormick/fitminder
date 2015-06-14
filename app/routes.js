@@ -7,25 +7,25 @@ var moment = require('moment-timezone');
 
 module.exports = function(app, passport) {
 
-    app.get('/', function(req, res) {
+    app.get('/', function(req, res, next) {
 
         res.render('index', { user: req.user });
 
     });
 
-    app.get('/auth/fitbit', passport.authenticate('fitbit'), function(req, res) {
+    app.get('/auth/fitbit', passport.authenticate('fitbit'), function(req, res, next) {
 
         // do nothing
         
     });
 
-    app.get('/auth/fitbit/callback', passport.authenticate('fitbit', { failureRedirect: '/login' }), function(req, res) {
+    app.get('/auth/fitbit/callback', passport.authenticate('fitbit', { failureRedirect: '/login' }), function(req, res, next) {
 
         res.redirect('/profile');
 
     });
     
-    app.get('/profile', ensureAuthenticated, function(req, res) {
+    app.get('/profile', ensureAuthenticated, function(req, res, next) {
 
         if (req.user.phoneNumber != null) {
             res.render('profile', { user: req.user });
@@ -35,7 +35,7 @@ module.exports = function(app, passport) {
 
     });
     
-    app.post('/profile', ensureAuthenticated, function(req, res) {
+    app.post('/profile', ensureAuthenticated, function(req, res, next) {
 
         var query = Profile.where({ encodedId: req.user.encodedId });
 
@@ -43,14 +43,14 @@ module.exports = function(app, passport) {
         query.findOne(function(err, data) {            
             if (err) {
                 console.log('Failed to retrieve data for query ' + query);
-                throw err;
+                return next(err);
             }
             
             var phoneNumber = phone(req.body.phoneNumber);
             if (phoneNumber == null ||
                 phoneNumber[0] == null) {
                 console.log('Failed to validate phone number ' + req.body.phoneNumber);
-                throw new Error('Failed to validate phone number ' + req.body.phoneNumber);
+                return next(new Error('Failed to validate phone number ' + req.body.phoneNumber));
             }
             
             // check to see if they are changing their phone number
@@ -63,7 +63,7 @@ module.exports = function(app, passport) {
                 console.log('Sending phone number verification message for ' + data.encodedId);
                 
                 // send a text message to confirm the phone number
-                twilio.sendMessage(data.phoneNumber, 'Hey, ' + data.nickname + '! Thanks for updating your phone number with Fitminder. Please reply \"yes\" to confirm your new number.');
+                twilio.sendMessage(data.phoneNumber, 'Hey, ' + data.nickname + '! Thanks for updating your phone number with Fitminder. Please reply \"yes\" to confirm your new number.', next);
             }
             
             data.inactivityThreshold = req.body.inactivityThreshold;
@@ -81,7 +81,7 @@ module.exports = function(app, passport) {
 
     });
     
-    app.get('/profile/delete', ensureAuthenticated, function(req, res) {
+    app.get('/profile/delete', ensureAuthenticated, function(req, res, next) {
 
         var query = Profile.where({ encodedId: req.user.encodedId });
 
@@ -89,11 +89,11 @@ module.exports = function(app, passport) {
         query.findOne(function(err, data) {            
             if (err) {
                 console.log('Failed to retrieve data for query ' + query);
-                throw err;
+                return next(err);
             }
             
             // delete the subscription for this user
-            fitbit.deleteSubscription(data);
+            fitbit.deleteSubscription(data, next);
             
             data.remove();
         });
@@ -103,13 +103,13 @@ module.exports = function(app, passport) {
 
     });
 
-    app.get('/profile/landing', ensureAuthenticated, function(req, res) {
+    app.get('/profile/landing', ensureAuthenticated, function(req, res, next) {
 
         res.render('landing', { user: req.user });
 
     });
 
-    app.post('/profile/landing', ensureAuthenticated, function(req, res) {
+    app.post('/profile/landing', ensureAuthenticated, function(req, res, next) {
 
         var query = Profile.where({ encodedId: req.user.encodedId });
 
@@ -117,14 +117,14 @@ module.exports = function(app, passport) {
         query.findOne(function(err, data) {
             if (err) {
                 console.log('Failed to retrieve data for query ' + query);
-                throw err;
+                return next(err);
             }
             
             var phoneNumber = phone(req.body.phoneNumber);
             if (phoneNumber == null ||
                 phoneNumber[0] == null) {
                 console.log('Failed to validate phone number ' + req.body.phoneNumber);
-                throw new Error('Failed to validate phone number ' + req.body.phoneNumber);
+                return next(new Error('Failed to validate phone number ' + req.body.phoneNumber));
             }
 
             // check to see if they are changing their phone number
@@ -137,7 +137,7 @@ module.exports = function(app, passport) {
                 console.log('Sending phone number verification message for ' + data.encodedId);
 
                 // send a text message to confirm the phone number
-                twilio.sendMessage(data.phoneNumber, 'Hey, ' + data.nickname + '! Thanks for signing up for Fitminder. Please reply \"yes\" to confirm your phone number.');
+                twilio.sendMessage(data.phoneNumber, 'Hey, ' + data.nickname + '! Thanks for signing up for Fitminder. Please reply \"yes\" to confirm your phone number.', next);
             }
             
             data.inactivityThreshold = req.body.inactivityThreshold;
@@ -155,13 +155,13 @@ module.exports = function(app, passport) {
 
     });
     
-    app.post('/api/twilio/inbound', function(req, res) {
+    app.post('/api/twilio/inbound', function(req, res, next) {
 
         var phoneNumber = phone(req.body.From);
         if (phoneNumber == null ||
             phoneNumber[0] == null) {
             console.log('Failed to validate phone number ' + req.body.From);
-            throw new Error('Failed to validate phone number ' + req.body.From);
+            return next(new Error('Failed to validate phone number ' + req.body.From));
         }
         
         var query = Profile.where({ phoneNumber: phoneNumber[0] });
@@ -170,7 +170,7 @@ module.exports = function(app, passport) {
         query.findOne(function(err, data) {            
             if (err) {
                 console.log('Failed to retrieve data for query ' + query);
-                throw err;
+                return next(err);
             }
             
             // check to see if we found a user
@@ -182,14 +182,14 @@ module.exports = function(app, passport) {
                     data.save();
                     
                     // send a text message to confirm number verification
-                    twilio.sendMessage(data.phoneNumber, 'Awesome. Your phone number has been verified!');
+                    twilio.sendMessage(data.phoneNumber, 'Awesome. Your phone number has been verified!', next);
                 } else {
                     // send a text message to confirm receipt
-                    twilio.sendMessage(phoneNumber[0], 'Hey there! We didn\'t understand your text message. For more information, please visit http://' + process.env.HOSTNAME + '.');
+                    twilio.sendMessage(phoneNumber[0], 'Hey there! We didn\'t understand your text message. For more information, please visit http://' + process.env.HOSTNAME + '.', next);
                 }
             } else {
                 // send a text message to confirm receipt
-                twilio.sendMessage(phoneNumber[0], 'Hey there! We didn\'t understand your text message. For more information, please visit http://' + process.env.HOSTNAME + '.');
+                twilio.sendMessage(phoneNumber[0], 'Hey there! We didn\'t understand your text message. For more information, please visit http://' + process.env.HOSTNAME + '.', next);
             }
         });
 
@@ -198,7 +198,7 @@ module.exports = function(app, passport) {
 
     });
 
-    app.post('/api/fitbit/notification', function(req, res) {
+    app.post('/api/fitbit/notification', function(req, res, next) {
 
         // process the individual notifications
         for (var i = 0; i < req.body.length; i++) {
@@ -208,7 +208,7 @@ module.exports = function(app, passport) {
             query.findOne(function(err, data) {
                 if (err) {
                     console.log('Failed to retrieve data for query ' + query);
-                    throw err;
+                    return next(err);
                 }
                 
                 data.lastSyncTime = moment.utc();
@@ -220,7 +220,7 @@ module.exports = function(app, passport) {
                     moment.utc().tz(data.timezone).hour() >= data.startTime &&
                     moment.utc().tz(data.timezone).hour() < data.endTime) {
                     // fetch the user's activity timeseries data
-                    fitbit.getTimeseries(data).then(function(timeseries) {
+                    fitbit.getTimeseries(data, next).then(function(timeseries) {
                         var sedentaryCount = 0;
 
                         // loop through the timeseries data to find when how long user has been sedentary
@@ -237,7 +237,7 @@ module.exports = function(app, passport) {
                             // check if we need to check for the user's step goal
                             if (data.dontSendRemindersAfterGoal) {
                                 // fetch the user's stats for today
-                                fitbit.getActivities(data).then(function(activities) {                                        
+                                fitbit.getActivities(data, next).then(function(activities) {                                        
                                     // check if user has met step goal for today
                                     if (activities.summary.steps < activities.goals.steps) {
                                         var reminder = generateReminder(data);
@@ -247,7 +247,7 @@ module.exports = function(app, passport) {
                                             console.log('Sending inactivity reminder for ' + data.encodedId);
                                             
                                             // send a text message to notify the user
-                                            twilio.sendMessage(data.phoneNumber, reminder);
+                                            twilio.sendMessage(data.phoneNumber, reminder, next);
 
                                             data.lastNotificationTime = moment.utc();
 
@@ -263,7 +263,7 @@ module.exports = function(app, passport) {
                                     console.log('Sending inactivity reminder for ' + data.encodedId);
                                     
                                     // send a text message to notify the user
-                                    twilio.sendMessage(data.phoneNumber, reminder);
+                                    twilio.sendMessage(data.phoneNumber, reminder, next);
 
                                     data.lastNotificationTime = moment.utc();
 
@@ -281,14 +281,14 @@ module.exports = function(app, passport) {
 
     });
 
-    app.get('/logout', function(req, res) {
+    app.get('/logout', function(req, res, next) {
 
         req.logout();
         res.redirect('/');
 
     });
     
-    app.use(function(req, res) {
+    app.use(function(req, res, next) {
 
         res.render('404');
 
@@ -307,7 +307,7 @@ function ensureAuthenticated(req, res, next) {
         return next();
     }
     
-    res.redirect('/')
+    res.redirect('/');
 }
 
 function generateGreeting(profile) {
