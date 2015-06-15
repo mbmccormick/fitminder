@@ -157,7 +157,7 @@ module.exports = function(app, passport) {
     
     app.post('/api/twilio/inbound', function(req, res, next) {
 
-        var phoneNumber = phone(req.body.From);
+        var phoneNumber = phone(req.body.From, req.body.FromCountry);
         if (phoneNumber == null ||
             phoneNumber[0] == null) {
             console.log('Failed to validate phone number ' + req.body.From);
@@ -297,6 +297,8 @@ module.exports = function(app, passport) {
     app.use(function(error, req, res, next) {
 
         res.render('500', { exception: error });
+
+        next(error);
 
     });
 
