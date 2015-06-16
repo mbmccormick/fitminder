@@ -194,6 +194,7 @@ module.exports = function(app, passport) {
         });
 
         // acknowledge the request
+        res.set('Content-Type', 'text/plain');
         res.status(200).end();
 
     });
@@ -277,6 +278,7 @@ module.exports = function(app, passport) {
         }
 
         // acknowledge the notification
+        res.set('Content-Type', 'text/plain');
         res.status(204).end();
 
     });
@@ -290,12 +292,14 @@ module.exports = function(app, passport) {
     
     app.use(function(req, res, next) {
 
+        res.status(404);
         res.render('404');
 
     });
     
     app.use(function(error, req, res, next) {
 
+        res.status(500);
         res.render('500', { exception: error });
 
         next(error);
