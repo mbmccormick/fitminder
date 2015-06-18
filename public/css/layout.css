@@ -14,6 +14,9 @@ a.text-danger, a.text-danger:hover {
 p.lead {
   font-size: 40px;
 }
+p.lead b {
+  color: #333333;
+}
 .container {
   width: auto;
   max-width: 800px;
