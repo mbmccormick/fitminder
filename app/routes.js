@@ -321,7 +321,9 @@ function generateGreeting(profile) {
         'Get up and move, ' + profile.nickname + '!',
         'Hey, ' + profile.nickname + '!',
         'Knock knock, ' + profile.nickname + '!',
-        'Wake up, ' + profile.nickname + '!'
+        'Wake up, ' + profile.nickname + '!',
+        'Hi, ' + profile.nickname + '!',
+        profile.nickname + '!'
     ];
 
     var index = Math.floor((Math.random() * greetings.length));
