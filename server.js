@@ -51,7 +51,7 @@ app.locals.fromNow = function (date) {
 require('./app/routes')(app, passport);
 
 // error handling ==============================================================
-var raygunClient = new raygun.Client().init({ apiKey: process.env.RAYGUN_APIKEY });
+var raygunClient = new raygun.Client().init({ apiKey: process.env.RAYGUN_API_KEY });
 
 raygunClient.user = function (req) {
     if (req.user) {
