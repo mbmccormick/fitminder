@@ -70,6 +70,14 @@
 
 <div class="spacer spacer-sm"></div>
 
+<form action="/profile/billing" method="post">
+    <p>Your Fitminder account will expire in <strong><%= fromNow(user.expirationDate) %></strong>. You can <a id="paymentLink" href="#">extend your membership</a> now or we'll send you a text message to a remind you when this gets closer.</p>
+
+    <input type="hidden" class="form-control" id="token" name="token">
+</form>
+
+<div class="spacer spacer-sm"></div>
+
 <p>Looking to give up? You can <a class="text-danger" href="/profile/delete" onclick="return confirm('Are you sure you want to delete your account?');">delete your account</a> if you really want to.</p>
 
 <script type="text/javascript">
@@ -112,6 +120,27 @@
 
             parent.removeClass('has-error');
             $("#phoneValidationError").remove();
+        });
+        
+        var handler = StripeCheckout.configure({
+            key: '<%= process.env.STRIPE_PUBLISHABLE_KEY %>',
+            token: function(token) {
+                $('#token').val(token.id);                
+                $('form').submit();
+            }
+        });
+        
+        $('#paymentLink').on('click', function(e) {
+            handler.open({
+                name: 'Matt McCormick',
+                description: 'Fitminder - Annual Fee',
+                amount: 1000
+            });
+            e.preventDefault();
+        });
+        
+        $(window).on('popstate', function() {
+            handler.close();
         });
     });
 </script>

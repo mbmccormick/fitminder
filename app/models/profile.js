@@ -18,7 +18,8 @@ var ProfileSchema  = new Schema({
     endTime: Number,
     dontSendRemindersAfterGoal: Boolean,
     lastSyncTime: Date,
-    lastNotificationTime: Date
+    lastNotificationTime: Date,
+    expirationDate: Date
 });
 
 ProfileSchema.plugin(findOrCreate);

@@ -1,6 +1,7 @@
 var Profile = require('./models/profile');
 var fitbit = require('./fitbit');
 var twilio = require('./twilio');
+var stripe = require('./stripe');
 
 var phone = require('phone');
 var moment = require('moment-timezone');
@@ -63,7 +64,7 @@ module.exports = function(app, passport) {
                 console.log('Sending phone number verification message for ' + data.encodedId);
                 
                 // send a text message to confirm the phone number
-                twilio.sendMessage(data.phoneNumber, 'Hey, ' + data.nickname + '! Thanks for updating your phone number with Fitminder. Please reply \"yes\" to confirm your new number.', next);
+                twilio.sendMessage(data, 'Hey, ' + data.nickname + '! Thanks for updating your phone number with Fitminder. Please reply \"yes\" to confirm your new number.', next);
             }
             
             data.inactivityThreshold = req.body.inactivityThreshold;
@@ -137,7 +138,7 @@ module.exports = function(app, passport) {
                 console.log('Sending phone number verification message for ' + data.encodedId);
 
                 // send a text message to confirm the phone number
-                twilio.sendMessage(data.phoneNumber, 'Hey, ' + data.nickname + '! Thanks for signing up for Fitminder. Please reply \"yes\" to confirm your phone number.', next);
+                twilio.sendMessage(data, 'Hey, ' + data.nickname + '! Thanks for signing up for Fitminder. Please reply \"yes\" to confirm your phone number.', next);
             }
             
             data.inactivityThreshold = req.body.inactivityThreshold;
@@ -151,6 +152,35 @@ module.exports = function(app, passport) {
             req.user = data;
 
             res.render('landing', { user: req.user });
+        });
+
+    });
+
+    app.post('/profile/billing', ensureAuthenticated, function(req, res, next) {
+
+        var query = Profile.where({ encodedId: req.user.encodedId });
+
+        // find the current user's profile
+        query.findOne(function(err, data) {            
+            if (err) {
+                console.log('Failed to retrieve data for query ' + query);
+                return next(err);
+            }
+            
+            // create the charge for this token
+            stripe.createCharge(data, req.body.token, next).then(function(charge) {
+                if (charge.status == 'succeeded') {
+                    console.log('Extending account expiration date for ' + data.encodedId);                
+                    data.expirationDate = moment(data.expirationDate).add(1, 'years');
+                    
+                    data.save();
+                
+                    // update the user's profile currently stored in session
+                    req.user = data;
+                }
+            
+                res.redirect('/profile');
+            });
         });
 
     });
@@ -182,14 +212,14 @@ module.exports = function(app, passport) {
                     data.save();
                     
                     // send a text message to confirm number verification
-                    twilio.sendMessage(data.phoneNumber, 'Awesome. Your phone number has been verified!', next);
+                    twilio.sendMessage(data, 'Awesome. Your phone number has been verified!', next);
                 } else {
                     // send a text message to confirm receipt
-                    twilio.sendMessage(phoneNumber[0], 'Hey there! We didn\'t understand your text message. For more information, please visit http://' + process.env.HOSTNAME + '.', next);
+                    twilio.sendGenericMessage(phoneNumber[0], 'Hey there! We didn\'t understand your text message. For more information, please visit http://' + process.env.HOSTNAME + '.', next);
                 }
             } else {
                 // send a text message to confirm receipt
-                twilio.sendMessage(phoneNumber[0], 'Hey there! We didn\'t understand your text message. For more information, please visit http://' + process.env.HOSTNAME + '.', next);
+                twilio.sendGenericMessage(phoneNumber[0], 'Hey there! We didn\'t understand your text message. For more information, please visit http://' + process.env.HOSTNAME + '.', next);
             }
         });
 
