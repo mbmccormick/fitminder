@@ -245,64 +245,80 @@ module.exports = function(app, passport) {
                 data.lastSyncTime = moment.utc();
 
                 data.save();
-
-                // check the last notification time and see if we are inside the user's reminder window
-                if (data.lastNotificationTime < moment.utc().subtract(data.inactivityThreshold * 15, 'minutes') &&
-                    moment.utc().tz(data.timezone).hour() >= data.startTime &&
-                    moment.utc().tz(data.timezone).hour() < data.endTime) {
-                    // fetch the user's activity timeseries data
-                    fitbit.getTimeseries(data, next).then(function(timeseries) {
-                        var sedentaryCount = 0;
-
-                        // loop through the timeseries data to find when how long user has been sedentary
-                        for (var j = timeseries['activities-calories-intraday'].dataset.length - 1; j >= 0; j--) {
-                            if (timeseries['activities-calories-intraday'].dataset[j].level == 0) {
-                                sedentaryCount++;
-                            } else {
-                                break;
-                            }
+                
+                // check if user has an active account
+                if (data.expirationDate > moment.utc()) {
+                    // check if user's account is nearing expiry
+                    if (data.expirationDate <= moment.utc().substract(1, 'weeks')) {
+                        // check if phone number is verified
+                        if (data.isPhoneNumberVerified) {
+                            console.log('Sending inactivity reminder for ' + data.encodedId);
+                            
+                            // send a text message to notify the user
+                            twilio.sendMessage(data, 'Your Fitminder account will expire in one week. Head over to http://' + process.env.HOSTNAME + ' soon to make a payment.', next);
                         }
-
-                        // check if user has been sedentary for the last 45 minutes
-                        if (sedentaryCount > data.inactivityThreshold) {
-                            // check if we need to check for the user's step goal
-                            if (data.dontSendRemindersAfterGoal) {
-                                // fetch the user's stats for today
-                                fitbit.getActivities(data, next).then(function(activities) {                                        
-                                    // check if user has met step goal for today
-                                    if (activities.summary.steps < activities.goals.steps) {
-                                        var reminder = generateReminder(data);
-
-                                        // check if phone number is verified
-                                        if (data.isPhoneNumberVerified) {
-                                            console.log('Sending inactivity reminder for ' + data.encodedId);
-                                            
-                                            // send a text message to notify the user
-                                            twilio.sendMessage(data.phoneNumber, reminder, next);
-
-                                            data.lastNotificationTime = moment.utc();
-
-                                            data.save();
-                                        }
-                                    }
-                                });
-                            } else {
-                                var reminder = generateReminder(data);
-
-                                // check if phone number is verified
-                                if (data.isPhoneNumberVerified) {
-                                    console.log('Sending inactivity reminder for ' + data.encodedId);
-                                    
-                                    // send a text message to notify the user
-                                    twilio.sendMessage(data.phoneNumber, reminder, next);
-
-                                    data.lastNotificationTime = moment.utc();
-
-                                    data.save();
+                    }
+                    
+                    // check the last notification time and see if we are inside the user's reminder window
+                    if (data.lastNotificationTime < moment.utc().subtract(data.inactivityThreshold * 15, 'minutes') &&
+                        moment.utc().tz(data.timezone).hour() >= data.startTime &&
+                        moment.utc().tz(data.timezone).hour() < data.endTime) {
+                        // fetch the user's activity timeseries data
+                        fitbit.getTimeseries(data, next).then(function(timeseries) {
+                            var sedentaryCount = 0;
+    
+                            // loop through the timeseries data to find when how long user has been sedentary
+                            for (var j = timeseries['activities-calories-intraday'].dataset.length - 1; j >= 0; j--) {
+                                if (timeseries['activities-calories-intraday'].dataset[j].level == 0) {
+                                    sedentaryCount++;
+                                } else {
+                                    break;
                                 }
                             }
-                        }
-                    });
+    
+                            // check if user has been sedentary for the last 45 minutes
+                            if (sedentaryCount > data.inactivityThreshold) {
+                                // check if we need to check for the user's step goal
+                                if (data.dontSendRemindersAfterGoal) {
+                                    // fetch the user's stats for today
+                                    fitbit.getActivities(data, next).then(function(activities) {                                        
+                                        // check if user has met step goal for today
+                                        if (activities.summary.steps < activities.goals.steps) {
+                                            var reminder = generateReminder(data);
+    
+                                            // check if phone number is verified
+                                            if (data.isPhoneNumberVerified) {
+                                                console.log('Sending inactivity reminder for ' + data.encodedId);
+                                                
+                                                // send a text message to notify the user
+                                                twilio.sendMessage(data, reminder, next);
+    
+                                                data.lastNotificationTime = moment.utc();
+    
+                                                data.save();
+                                            }
+                                        }
+                                    });
+                                } else {
+                                    var reminder = generateReminder(data);
+    
+                                    // check if phone number is verified
+                                    if (data.isPhoneNumberVerified) {
+                                        console.log('Sending inactivity reminder for ' + data.encodedId);
+                                        
+                                        // send a text message to notify the user
+                                        twilio.sendMessage(data, reminder, next);
+    
+                                        data.lastNotificationTime = moment.utc();
+    
+                                        data.save();
+                                    }
+                                }
+                            }
+                        });
+                    }
+                } else {
+                    console.log('Ignoring payload for ' + data.encodedId + ' because user\'s account is expired');
                 }
             });
         }
