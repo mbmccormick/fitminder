@@ -3,6 +3,8 @@ var FitbitStrategy = require('passport-fitbit2').Strategy;
 var Profile = require('../app/models/profile');
 var fitbit = require('../app/fitbit');
 
+var moment = require('moment-timezone');
+
 module.exports = function(passport) {
 
     passport.serializeUser(function(user, done) {
@@ -48,6 +50,7 @@ module.exports = function(passport) {
                         data.dontSendRemindersAfterGoal = false;
                         data.lastSyncTime = null;
                         data.lastNotificationTime = null;
+                        data.expirationDate = moment().utc().add(2, 'weeks');
                     } else {
                         console.log('New dashboard session for ' + profile.id);
                     }

@@ -289,7 +289,7 @@ module.exports = function(app, passport) {
 				
 				function(data, callback) {
 					// check if user's account is nearing expiry
-					if (data.expirationDate <= moment.utc().substract(1, 'weeks')) {
+					if (data.expirationDate <= moment.utc().subtract(1, 'weeks')) {
 						// check if phone number is verified
 						if (data.isPhoneNumberVerified) {
 							console.log('Sending inactivity reminder for ' + data.encodedId);
