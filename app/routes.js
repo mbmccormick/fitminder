@@ -198,9 +198,9 @@ module.exports = function(app, passport) {
 				if (phoneNumber == null ||
 					phoneNumber[0] == null) {
 					callback(new Error('Failed to validate phone number ' + req.body.From));
-				}
-				
-				callback(null, phoneNumber);
+                } else {
+				    callback(null, phoneNumber);
+                }
 			},
 
 			function(phoneNumber, callback) {
@@ -213,13 +213,13 @@ module.exports = function(app, passport) {
 						twilio.sendGenericMessage(phoneNumber[0], 'Hey there! We didn\'t understand your text message. For more information, please visit http://' + process.env.HOSTNAME + '.', next);
 						
 						callback(err);
-					}
-					
-					data.lastSyncTime = moment.utc();
-
-					data.save();
-					
-					callback(null, data);
+					} else {					
+    					data.lastSyncTime = moment.utc();
+    
+    					data.save();
+    					
+    					callback(null, data);
+                    }
 				});
 			},
 			
@@ -236,8 +236,6 @@ module.exports = function(app, passport) {
 					// send a text message to confirm receipt
 					twilio.sendGenericMessage(phoneNumber[0], 'Hey there! We didn\'t understand your text message. For more information, please visit http://' + process.env.HOSTNAME + '.', next);
 				}
-				
-				callback(null);
 			}
 			
 		], function (err, result) {
@@ -268,13 +266,13 @@ module.exports = function(app, passport) {
 					query.findOne(function(err, data) {
 						if (err) {
 							callback(err);
-						}
-						
-						data.lastSyncTime = moment.utc();
-
-						data.save();
-						
-						callback(null, data);
+						} else {						
+    						data.lastSyncTime = moment.utc();
+    
+    						data.save();
+    						
+    						callback(null, data);
+                        }
 					});
 				},
 				
@@ -282,17 +280,17 @@ module.exports = function(app, passport) {
 					// check if user has an active account
 					if (data.expirationDate > moment.utc()) {
 						callback(null, data);
-					}
-					
-					callback(new Error('The user\'s account has expired. No action required.'));
+					} else {					
+					   callback(new Error('The user\'s account has expired. No action required.'));
+                    }
 				},
 				
 				function(data, callback) {
 					// check if user's account is nearing expiry
-					if (data.expirationDate <= moment.utc().subtract(1, 'weeks')) {
+					if (data.expirationDate <= moment.utc().add(1, 'weeks')) {
 						// check if phone number is verified
 						if (data.isPhoneNumberVerified) {
-							console.log('Sending inactivity reminder for ' + data.encodedId);
+							console.log('Sending account expiration notice for ' + data.encodedId);
 							
 							// send a text message to notify the user
 							twilio.sendMessage(data, 'Your Fitminder account will expire ' + moment(data.expirationDate).fromNow() + '. Head over to http://' + process.env.HOSTNAME + ' soon to make a payment.', next);
@@ -308,9 +306,9 @@ module.exports = function(app, passport) {
 						moment.utc().tz(data.timezone).hour() >= data.startTime &&
 						moment.utc().tz(data.timezone).hour() < data.endTime) {
 						callback(null, data);
-					}
-					
-					callback(new Error('Outside of reminder window or inside of notification threshold. No action required.'));
+					} else {					
+					   callback(new Error('Outside of reminder window or inside of notification threshold. No action required.'));
+                    }
 				},
 				
 				function (data, callback) {
@@ -321,13 +319,13 @@ module.exports = function(app, passport) {
 							// check if user has met step goal for today
 							if (activities.summary.steps < activities.goals.steps) {
 								callback(null, data);
-							}
-							
-							callback(new Error('User has not met step goal for today. No action required.'));
+							} else {
+                                callback(new Error('User has not met step goal for today. No action required.'));
+                            }
 						});
-					}
-					
-					callback(null, data);
+					} else {					
+					   callback(null, data);
+                    }
 				},
 				
 				function (data, callback) {
