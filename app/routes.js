@@ -293,7 +293,7 @@ module.exports = function(app, passport) {
 							console.log('Sending account expiration notice for ' + data.encodedId);
 							
 							// send a text message to notify the user
-							twilio.sendMessage(data, 'Your Fitminder account will expire ' + moment(data.expirationDate).fromNow() + '. Head over to http://' + process.env.HOSTNAME + ' soon to make a payment.', next);
+							twilio.sendMessage(data, 'Your Fitminder account will expire ' + moment(data.expirationDate).fromNow() + '. Login at http://' + process.env.HOSTNAME + ' soon to make a payment.', next);
 						}
 					}
 					
