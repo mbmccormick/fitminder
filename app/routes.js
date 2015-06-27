@@ -234,7 +234,7 @@ module.exports = function(app, passport) {
 					twilio.sendMessage(data, 'Awesome. Your phone number has been verified!', next);
 				} else {
 					// send a text message to confirm receipt
-					twilio.sendGenericMessage(phoneNumber[0], 'Hey there! We didn\'t understand your text message. For more information, please visit http://' + process.env.HOSTNAME + '.', next);
+					twilio.sendGenericMessage(data.phoneNumber, 'Hey there! We didn\'t understand your text message. For more information, please visit http://' + process.env.HOSTNAME + '.', next);
 				}
 			}
 			
