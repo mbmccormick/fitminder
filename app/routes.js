@@ -170,7 +170,8 @@ module.exports = function(app, passport) {
             
             // create the charge for this token
             stripe.createCharge(data, req.body.token, next).then(function(charge) {
-                if (charge.status == 'succeeded') {
+                if (charge.status == 'succeeded' ||
+                    charge.status == 'paid') {
                     console.log('Extending account expiration date for ' + data.encodedId);                
                     data.expirationDate = moment(data.expirationDate).add(1, 'years');
                     
@@ -178,6 +179,9 @@ module.exports = function(app, passport) {
                 
                     // update the user's profile currently stored in session
                     req.user = data;
+                } else {
+                    console.error('Failed to validate charge ' + charge.id);
+                    return next(new Error('Failed to validate charge ' + charge.id));
                 }
             
                 res.redirect('/profile');
