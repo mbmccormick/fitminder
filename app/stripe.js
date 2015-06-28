@@ -13,7 +13,7 @@ exports.createCharge = function(profile, token, next) {
             }
         }, function(err, charge) {
             if (err) {
-                console.log('Failed');
+                console.error('Failed');
                 return next(err);
             }
             

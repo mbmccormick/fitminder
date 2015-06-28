@@ -44,14 +44,14 @@ module.exports = function(app, passport) {
         // find the current user's profile
         query.findOne(function(err, data) {            
             if (err) {
-                console.log('Failed to retrieve data for query ' + query);
+                console.error('Failed to retrieve data for query ' + query);
                 return next(err);
             }
             
             var phoneNumber = phone(req.body.phoneNumber);
             if (phoneNumber == null ||
                 phoneNumber[0] == null) {
-                console.log('Failed to validate phone number ' + req.body.phoneNumber);
+                console.error('Failed to validate phone number ' + req.body.phoneNumber);
                 return next(new Error('Failed to validate phone number ' + req.body.phoneNumber));
             }
             
@@ -90,7 +90,7 @@ module.exports = function(app, passport) {
         // find the current user's profile
         query.findOne(function(err, data) {            
             if (err) {
-                console.log('Failed to retrieve data for query ' + query);
+                console.error('Failed to retrieve data for query ' + query);
                 return next(err);
             }
             
@@ -118,14 +118,14 @@ module.exports = function(app, passport) {
         // find the current user's profile
         query.findOne(function(err, data) {
             if (err) {
-                console.log('Failed to retrieve data for query ' + query);
+                console.error('Failed to retrieve data for query ' + query);
                 return next(err);
             }
             
             var phoneNumber = phone(req.body.phoneNumber);
             if (phoneNumber == null ||
                 phoneNumber[0] == null) {
-                console.log('Failed to validate phone number ' + req.body.phoneNumber);
+                console.error('Failed to validate phone number ' + req.body.phoneNumber);
                 return next(new Error('Failed to validate phone number ' + req.body.phoneNumber));
             }
 
@@ -164,7 +164,7 @@ module.exports = function(app, passport) {
         // find the current user's profile
         query.findOne(function(err, data) {            
             if (err) {
-                console.log('Failed to retrieve data for query ' + query);
+                console.error('Failed to retrieve data for query ' + query);
                 return next(err);
             }
             
@@ -240,7 +240,7 @@ module.exports = function(app, passport) {
 			
 		], function (err, result) {
 			if (err) {
-				console.log(err);
+				console.error(err);
 				return next(err);
 			}
 		});
@@ -367,7 +367,7 @@ module.exports = function(app, passport) {
 				
 			], function (err, result) {
 				if (err) {
-					console.log(err);
+					console.error(err);
 					return next(err);
 				}
 			});

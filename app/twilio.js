@@ -9,7 +9,7 @@ exports.sendMessage = function(profile, message, next) {
             body: message
         }, function(err, responseData) {
             if (err) {
-                console.log('Failed');
+                console.error('Failed');
                 return next(err);
             }
             
@@ -27,7 +27,7 @@ exports.sendGenericMessage = function(phoneNumber, message, next) {
             body: message
         }, function(err, responseData) {
             if (err) {
-                console.log('Failed');
+                console.error('Failed');
                 return next(err);
             }
             

@@ -8,7 +8,7 @@ exports.createSubscription = function(profile, next) {
     return client.requestResource('/activities/apiSubscriptions/' + profile.encodedId + '.json', 'POST', profile.oauthToken, profile.oauthTokenSecret).then(function(results) {
         if (results[1].statusCode != 200 &&
             results[1].statusCode != 201) {
-            console.log('Failed');
+            console.error('Failed');
             return next(new Error('Failed to create Fitbit subscription'));
         }
         
@@ -28,7 +28,7 @@ exports.deleteSubscription = function(profile, next) {
     return client.requestResource('/activities/apiSubscriptions/' + profile.encodedId + '.json', 'DELETE', profile.oauthToken, profile.oauthTokenSecret).then(function(results) {
         if (results[1].statusCode != 204 &&
             results[1].statusCode != 404) {
-            console.log('Failed');
+            console.error('Failed');
             return next(new Error('Failed to delete Fitbit subscription'));
         }
 
@@ -47,7 +47,7 @@ exports.getTimeseries = function(profile, next) {
 
     return client.requestResource('/activities/calories/date/today/1d/15min.json', 'GET', profile.oauthToken, profile.oauthTokenSecret).then(function(results) {
         if (results[1].statusCode != 200) {
-            console.log('Failed');
+            console.error('Failed');
             return next(new Error('Failed to retrieve Fitbit timeseries data'));
         }
 
@@ -66,7 +66,7 @@ exports.getActivities = function(profile, next) {
 
     return client.requestResource('/activities/date/today.json', 'GET', profile.oauthToken, profile.oauthTokenSecret).then(function(results) {
         if (results[1].statusCode != 200) {
-            console.log('Failed');
+            console.error('Failed');
             return next(new Error('Failed to retrieve Fitbit activity stats'));
         }
 
