@@ -170,8 +170,7 @@ module.exports = function(app, passport) {
             
             // create the charge for this token
             stripe.createCharge(data, req.body.token, next).then(function(charge) {
-                if (charge.status == 'succeeded' ||
-                    charge.status == 'paid') {
+                if (charge.status == 'succeeded') {
                     console.log('Extending account expiration date for ' + data.encodedId);                
                     data.expirationDate = moment(data.expirationDate).add(1, 'years');
                     

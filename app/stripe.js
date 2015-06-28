@@ -7,7 +7,7 @@ exports.createCharge = function(profile, token, next) {
             amount: 1000,
             currency: "usd",
             source: token,
-            description: "Fitminder - Annual Fee",
+            description: "Fitminder - 1 Year Membership",
             metadata: {
                 'encodedId': profile.encodedId
             }
