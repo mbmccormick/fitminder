@@ -12,10 +12,13 @@ a.text-danger, a.text-danger:hover {
   color: #ff4136;
 }
 p.lead {
-  font-size: 40px;
+  font-size: 200%;
 }
 p.lead b {
   color: #333333;
+}
+p.subhero {
+  font-size: 115%;
 }
 .container {
   width: auto;
