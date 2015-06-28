@@ -212,7 +212,7 @@ module.exports = function(app, passport) {
 						// send a text message to confirm receipt
 						twilio.sendGenericMessage(phoneNumber[0], 'Hey there! We didn\'t understand your text message. For more information, please visit http://' + process.env.HOSTNAME + '.', next);
 						
-						callback(err);
+						callback(err, true);
 					} else {					
     					data.lastSyncTime = moment.utc();
     
@@ -241,7 +241,9 @@ module.exports = function(app, passport) {
 		], function (err, result) {
 			if (err) {
 				console.error(err);
-				return next(err);
+                
+                if (result)
+				    return next(err);
 			}
 		});
 
@@ -254,18 +256,18 @@ module.exports = function(app, passport) {
     app.post('/api/fitbit/notification', function(req, res, next) {
 
         // process the individual notifications
-		for (var i = 0; i < req.body.length; i++) {
+		req.body.forEach(function (item) {
 			
 			// spawn the asynchronous waterfall handler
 			async.waterfall([
 			
 				function(callback) {
-					var query = Profile.where({ encodedId: req.body[i].ownerId });
+					var query = Profile.where({ encodedId: item.ownerId });
 					
 					// find the user associated with this notification
 					query.findOne(function(err, data) {
 						if (err) {
-							callback(err);
+							callback(err, true);
 						} else {						
     						data.lastSyncTime = moment.utc();
     
@@ -281,37 +283,22 @@ module.exports = function(app, passport) {
 					if (data.expirationDate > moment.utc()) {
 						callback(null, data);
 					} else {					
-					   callback(new Error('The user\'s account has expired. No action required.'));
+					    callback(new Error('The user\'s account has expired. No action required.'));
                     }
 				},
 				
-				function(data, callback) {
-					// check if user's account is nearing expiry
-					if (data.expirationDate <= moment.utc().add(1, 'weeks')) {
-						// check if phone number is verified
-						if (data.isPhoneNumberVerified) {
-							console.log('Sending account expiration notice for ' + data.encodedId);
-							
-							// send a text message to notify the user
-							twilio.sendMessage(data, 'Your Fitminder account will expire ' + moment(data.expirationDate).fromNow() + '. Login at http://' + process.env.HOSTNAME + ' soon to make a payment.', next);
-						}
-					}
-					
-					callback(null, data);
-				},
-				
 				function (data, callback) {
-					// check the last notification time and see if we are inside the user's reminder window
+                    // check the last notification time and see if we are inside the user's reminder window
 					if (data.lastNotificationTime < moment.utc().subtract(data.inactivityThreshold * 15, 'minutes') &&
 						moment.utc().tz(data.timezone).hour() >= data.startTime &&
 						moment.utc().tz(data.timezone).hour() < data.endTime) {
 						callback(null, data);
 					} else {					
-					   callback(new Error('Outside of reminder window or inside of notification threshold. No action required.'));
+					    callback(new Error('Outside of reminder window or inside of notification threshold. No action required.'));
                     }
 				},
 				
-				function (data, callback) {
+				function (data, callback) {                    
 					// check if we need to check for the user's step goal
 					if (data.dontSendRemindersAfterGoal) {
 						// fetch the user's stats for today
@@ -324,12 +311,12 @@ module.exports = function(app, passport) {
                             }
 						});
 					} else {					
-					   callback(null, data);
+					    callback(null, data);
                     }
 				},
 				
 				function (data, callback) {
-					// fetch the user's activity timeseries data
+                    // fetch the user's activity timeseries data
 					fitbit.getTimeseries(data, next).then(function(timeseries) {
 						var sedentaryCount = 0;
 
@@ -347,7 +334,7 @@ module.exports = function(app, passport) {
 				},
 				
 				function (sedentaryCount, data, callback) {
-					// check if user has been sedentary for too long
+                    // check if user has been sedentary for too long
 					if (sedentaryCount > data.inactivityThreshold) {
 						var reminder = generateReminder(data);
 
@@ -361,6 +348,25 @@ module.exports = function(app, passport) {
 							data.lastNotificationTime = moment.utc();
 
 							data.save();
+                            
+                            callback(null, data);
+						} else {
+                            callback(null, data);
+                        }
+					} else {
+                        callback(null, data);
+                    }
+				},
+				
+				function(data, callback) {
+					// check if user's account is nearing expiry
+					if (data.expirationDate <= moment.utc().add(1, 'weeks')) {
+						// check if phone number is verified
+						if (data.isPhoneNumberVerified) {
+							console.log('Sending account expiration notice for ' + data.encodedId);
+							
+							// send a text message to notify the user
+							twilio.sendMessage(data, 'Your Fitminder account will expire ' + moment(data.expirationDate).fromNow() + '! Login at http://' + process.env.HOSTNAME + ' soon to renew your membership.', next);
 						}
 					}
 				}
@@ -368,11 +374,13 @@ module.exports = function(app, passport) {
 			], function (err, result) {
 				if (err) {
 					console.error(err);
-					return next(err);
+                    
+                    if (result)
+					   return next(err);
 				}
 			});
 			
-		}
+		});
 
         // acknowledge the notification
         res.set('Content-Type', 'text/plain');

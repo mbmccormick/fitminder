@@ -47,6 +47,10 @@ app.locals.fromNow = function (date) {
         return 'never';
 }
 
+app.locals.utc = function () {
+    return moment.utc();
+}
+
 // routes ======================================================================
 require('./app/routes')(app, passport);
 
