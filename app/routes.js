@@ -254,13 +254,13 @@ module.exports = function(app, passport) {
     app.post('/api/fitbit/notification', function(req, res, next) {
 
         // process the individual notifications
-		req.body.forEach(function(item) {
+		for (var i = 0; i < req.body.length; i++) {
 			
 			// spawn the asynchronous waterfall handler
 			async.waterfall([
 			
 				function(callback) {
-					var query = Profile.where({ encodedId: item.ownerId });
+					var query = Profile.where({ encodedId: req.body[i].ownerId });
 					
 					// find the user associated with this notification
 					query.findOne(function(err, data) {
@@ -372,7 +372,7 @@ module.exports = function(app, passport) {
 				}
 			});
 			
-		});
+		}
 
         // acknowledge the notification
         res.set('Content-Type', 'text/plain');
