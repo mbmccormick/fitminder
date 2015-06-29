@@ -14,6 +14,12 @@ module.exports = function(app, passport) {
         res.render('index', { user: req.user });
 
     });
+    
+    app.get('/faq', function(req, res, next) {
+
+        res.render('faq', { user: req.user });
+
+    });
 
     app.get('/auth/fitbit', passport.authenticate('fitbit'), function(req, res, next) {
 
