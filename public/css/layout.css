@@ -24,6 +24,9 @@ p.lead b {
 p.subhero {
   font-size: 115%;
 }
+p.lead b {
+  color: #333333;
+}
 .container {
   width: auto;
   max-width: 800px;
