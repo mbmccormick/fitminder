@@ -51,6 +51,14 @@ app.locals.utc = function () {
     return moment.utc();
 }
 
+app.locals.add = function (date, amount, unit) {
+    return moment(date).add(amount, unit);
+}
+
+app.locals.subtract = function (date, amount, unit) {
+    return moment(date).subtract(amount, unit);
+}
+
 // routes ======================================================================
 require('./app/routes')(app, passport);
 
