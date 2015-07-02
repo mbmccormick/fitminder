@@ -293,7 +293,14 @@ module.exports = function(app, passport) {
 						callback(null, data);
 					} else {
                         if (data.lastNotificationTime < data.expirationDate) {
-                            // TODO: send a final expiration notice
+                            console.log('Sending final account expiration notice for ' + data.encodedId);
+							
+							// send a text message to notify the user
+							twilio.sendMessage(data, 'Your Fitminder account has expired and you will no longer receive activity reminders! Login at http://' + process.env.HOSTNAME + ' to renew your membership.', next);
+                            
+							data.lastNotificationTime = moment.utc();
+
+							data.save();
                         }
                         
 					    callback(new Error('The user\'s account has expired. No action required.'));
@@ -427,12 +434,15 @@ module.exports = function(app, passport) {
 };
 
 function ensureSecured(req, res, next) {
-    if (process.env.REQUIRE_SSL != true ||
-        req.headers["x-forwarded-proto"] === "https") {
-       return next();
+    if (process.env.REQUIRE_SSL) {
+        if (req.headers["x-forwarded-proto"] === "https") {
+            return next();
+        }
+        
+        res.redirect("https://" + req.headers.host + req.url);
+    } else {
+        return next();
     }
-    
-    res.redirect("https://" + req.headers.host + req.url);
 }
 
 function ensureAuthenticated(req, res, next) {
