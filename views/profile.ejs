@@ -74,7 +74,7 @@
     <% if (user.expirationDate > add(utc(), 30, 'days')) { %>
     <p>Your Fitminder account will expire in <strong><%= fromNow(user.expirationDate) %></strong>. We'll send you a text message when it's time to renew your membership.</p>
     <% } else if (user.expirationDate > utc()) { %>
-    <p>Your Fitminder account will expire in <strong><%= fromNow(user.expirationDate) %></strong>. You can <a id="paymentLink" href="#">renew your membership</a> now or we'll send you a text message to a remind you when this gets closer.</p>
+    <p>Your Fitminder account will expire in <strong><%= fromNow(user.expirationDate) %></strong>. You can <a id="paymentLink" href="#">renew your membership</a> now or we'll send you a text message to remind you when this gets closer.</p>
     <% } else { %>
     <p>Your Fitminder account has expired. <a id="paymentLink" href="#">Renew your membership</a> now to start receiving reminders again.</p>
     <% } %>
