@@ -10,14 +10,22 @@ var moment = require('moment-timezone');
 module.exports = function(app, passport) {
 
     app.get('/', function(req, res, next) {
-
-        res.render('index', { user: req.user });
+        
+        if (req.user) {
+            res.redirect('/profile');
+        } else {
+            res.render('index', { user: req.user });
+        }
 
     });
     
     app.get('/faq', function(req, res, next) {
 
-        res.render('faq', { user: req.user });
+        if (req.user) {
+            res.redirect('/profile');
+        } else {
+            res.render('faq', { user: req.user });
+        }
 
     });
 
