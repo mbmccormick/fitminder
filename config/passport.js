@@ -50,7 +50,7 @@ module.exports = function(passport) {
                         data.dontSendRemindersAfterGoal = false;
                         data.lastSyncTime = null;
                         data.lastNotificationTime = null;
-                        data.expirationDate = moment().utc().add(2, 'weeks');
+                        data.expirationDate = moment().utc().add(2, 'weeks'); // 2 week free trial
                     } else {
                         console.log('New dashboard session for ' + profile.id);
                     }
