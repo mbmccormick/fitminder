@@ -33,7 +33,7 @@ module.exports = function(app, passport) {
 
     });
     
-    app.get('/profile', ensureAuthenticated, function(req, res, next) {
+    app.get('/profile', ensureSecured, ensureAuthenticated, function(req, res, next) {
 
         if (req.user.phoneNumber != null) {
             res.render('profile', { user: req.user });
@@ -43,7 +43,7 @@ module.exports = function(app, passport) {
 
     });
     
-    app.post('/profile', ensureAuthenticated, function(req, res, next) {
+    app.post('/profile', ensureSecured, ensureAuthenticated, function(req, res, next) {
 
         var query = Profile.where({ encodedId: req.user.encodedId });
 
@@ -89,7 +89,7 @@ module.exports = function(app, passport) {
 
     });
     
-    app.get('/profile/delete', ensureAuthenticated, function(req, res, next) {
+    app.get('/profile/delete', ensureSecured, ensureAuthenticated, function(req, res, next) {
 
         var query = Profile.where({ encodedId: req.user.encodedId });
 
@@ -111,13 +111,13 @@ module.exports = function(app, passport) {
 
     });
 
-    app.get('/profile/landing', ensureAuthenticated, function(req, res, next) {
+    app.get('/profile/landing', ensureSecured, ensureAuthenticated, function(req, res, next) {
 
         res.render('landing', { user: req.user });
 
     });
 
-    app.post('/profile/landing', ensureAuthenticated, function(req, res, next) {
+    app.post('/profile/landing', ensureSecured, ensureAuthenticated, function(req, res, next) {
 
         var query = Profile.where({ encodedId: req.user.encodedId });
 
@@ -163,7 +163,7 @@ module.exports = function(app, passport) {
 
     });
 
-    app.post('/profile/billing', ensureAuthenticated, function(req, res, next) {
+    app.post('/profile/billing', ensureSecured, ensureAuthenticated, function(req, res, next) {
 
         var query = Profile.where({ encodedId: req.user.encodedId });
 
@@ -291,7 +291,11 @@ module.exports = function(app, passport) {
 					// check if user has an active account
 					if (data.expirationDate > moment.utc()) {
 						callback(null, data);
-					} else {					
+					} else {
+                        if (data.lastNotificationTime < data.expirationDate) {
+                            // TODO: send a final expiration notice
+                        }
+                        
 					    callback(new Error('The user\'s account has expired. No action required.'));
                     }
 				},
@@ -421,6 +425,15 @@ module.exports = function(app, passport) {
     });
 
 };
+
+function ensureSecured(req, res, next) {
+    if (process.env.REQUIRE_SSL != true ||
+        req.headers["x-forwarded-proto"] === "https") {
+       return next();
+    }
+    
+    res.redirect("https://" + req.headers.host + req.url);
+}
 
 function ensureAuthenticated(req, res, next) {
     if (req.isAuthenticated()) {
