@@ -205,64 +205,64 @@ module.exports = function(app, passport) {
     
     app.post('/api/twilio/inbound', function(req, res, next) {
 
-		// spawn the asynchronous waterfall handler
+        // spawn the asynchronous waterfall handler
         async.waterfall([
 
-			function(callback) {
-				var phoneNumber = phone(req.body.From, req.body.FromCountry);
-				
-				// validate the phone number
-				if (phoneNumber == null ||
-					phoneNumber[0] == null) {
-					callback(new Error('Failed to validate phone number ' + req.body.From));
+            function(callback) {
+                var phoneNumber = phone(req.body.From, req.body.FromCountry);
+                
+                // validate the phone number
+                if (phoneNumber == null ||
+                    phoneNumber[0] == null) {
+                    callback(new Error('Failed to validate phone number ' + req.body.From));
                 } else {
-				    callback(null, phoneNumber);
+                    callback(null, phoneNumber);
                 }
-			},
+            },
 
-			function(phoneNumber, callback) {
-				var query = Profile.where({ phoneNumber: phoneNumber[0] });
-				
-				// find the user associated with this notification
-				query.findOne(function(err, data) {
-					if (err) {
-						// send a text message to confirm receipt
-						twilio.sendGenericMessage(phoneNumber[0], 'Hey there! We didn\'t understand your text message. For more information, please visit http://' + process.env.HOSTNAME + '.', next);
-						
-						callback(err, true);
-					} else {					
-    					data.lastSyncTime = moment.utc();
+            function(phoneNumber, callback) {
+                var query = Profile.where({ phoneNumber: phoneNumber[0] });
+                
+                // find the user associated with this notification
+                query.findOne(function(err, data) {
+                    if (err) {
+                        // send a text message to confirm receipt
+                        twilio.sendGenericMessage(phoneNumber[0], 'Hey there! We didn\'t understand your text message. For more information, please visit http://' + process.env.HOSTNAME + '.', next);
+                        
+                        callback(err, true);
+                    } else {                    
+                        data.lastSyncTime = moment.utc();
     
-    					data.save();
-    					
-    					callback(null, data);
+                        data.save();
+                        
+                        callback(null, data);
                     }
-				});
-			},
-			
-			function(data, callback) {
-				// check to see if the user correctly verified their number
-				if (req.body.Body.trim().toLowerCase() == 'yes') {
-					data.isPhoneNumberVerified = true;
-					
-					data.save();
-					
-					// send a text message to confirm number verification
-					twilio.sendMessage(data, 'Awesome. Your phone number has been verified!', next);
-				} else {
-					// send a text message to confirm receipt
-					twilio.sendGenericMessage(data.phoneNumber, 'Hey there! We didn\'t understand your text message. For more information, please visit http://' + process.env.HOSTNAME + '.', next);
-				}
-			}
-			
-		], function (err, result) {
-			if (err) {
-				console.error(err);
+                });
+            },
+            
+            function(data, callback) {
+                // check to see if the user correctly verified their number
+                if (req.body.Body.trim().toLowerCase() == 'yes') {
+                    data.isPhoneNumberVerified = true;
+                    
+                    data.save();
+                    
+                    // send a text message to confirm number verification
+                    twilio.sendMessage(data, 'Awesome. Your phone number has been verified!', next);
+                } else {
+                    // send a text message to confirm receipt
+                    twilio.sendGenericMessage(data.phoneNumber, 'Hey there! We didn\'t understand your text message. For more information, please visit http://' + process.env.HOSTNAME + '.', next);
+                }
+            }
+            
+        ], function (err, result) {
+            if (err) {
+                console.error(err);
                 
                 if (result)
-				    return next(err);
-			}
-		});
+                    return next(err);
+            }
+        });
 
         // acknowledge the request
         res.set('Content-Type', 'text/plain');
@@ -273,142 +273,142 @@ module.exports = function(app, passport) {
     app.post('/api/fitbit/notification', function(req, res, next) {
 
         // process the individual notifications
-		req.body.forEach(function (item) {
-			
-			// spawn the asynchronous waterfall handler
-			async.waterfall([
-			
-				function(callback) {
-					var query = Profile.where({ encodedId: item.ownerId });
-					
-					// find the user associated with this notification
-					query.findOne(function(err, data) {
-						if (err) {
-							callback(err, true);
-						} else {						
-    						data.lastSyncTime = moment.utc();
+        req.body.forEach(function (item) {
+            
+            // spawn the asynchronous waterfall handler
+            async.waterfall([
+            
+                function(callback) {
+                    var query = Profile.where({ encodedId: item.ownerId });
+                    
+                    // find the user associated with this notification
+                    query.findOne(function(err, data) {
+                        if (err) {
+                            callback(err, true);
+                        } else {                        
+                            data.lastSyncTime = moment.utc();
     
-    						data.save();
-    						
-    						callback(null, data);
+                            data.save();
+                            
+                            callback(null, data);
                         }
-					});
-				},
-				
-				function (data, callback) {
-                    // check the last notification time and see if we are inside the user's reminder window
-					if (data.lastNotificationTime < moment.utc().subtract(data.inactivityThreshold * 15, 'minutes') &&
-						moment.utc().tz(data.timezone).hour() >= data.startTime &&
-						moment.utc().tz(data.timezone).hour() < data.endTime) {
-						callback(null, data);
-					} else {					
-					    callback(new Error('Outside of reminder window or inside of notification threshold. No action required.'));
-                    }
-				},
-				
-				function(data, callback) {
-					// check if user has an active account
-					if (data.expirationDate > moment.utc()) {
-						callback(null, data);
-					} else {
+                    });
+                },
+                
+                function(data, callback) {
+                    // check if user has an active account
+                    if (data.expirationDate > moment.utc()) {
+                        callback(null, data);
+                    } else {
                         if (data.lastNotificationTime < data.expirationDate) {
                             console.log('Sending final account expiration notice for ' + data.encodedId);
-							
-							// send a text message to notify the user
-							twilio.sendMessage(data, 'Your Fitminder account has expired and you will no longer receive activity reminders! Login at http://' + process.env.HOSTNAME + ' to renew your membership.', next);
                             
-							data.lastNotificationTime = moment.utc();
+                            // send a text message to notify the user
+                            twilio.sendMessage(data, 'Your Fitminder account has expired and you will no longer receive activity reminders! Login at http://' + process.env.HOSTNAME + ' to renew your membership.', next);
+                            
+                            data.lastNotificationTime = moment.utc();
 
-							data.save();
+                            data.save();
                         }
                         
-					    callback(new Error('The user\'s account has expired. No action required.'));
+                        callback(new Error('The user\'s account has expired. No action required.'));
                     }
-				},
-				
-				function (data, callback) {                    
-					// check if we need to check for the user's step goal
-					if (data.dontSendRemindersAfterGoal) {
-						// fetch the user's stats for today
-						fitbit.getActivities(data, next).then(function(activities) {                                        
-							// check if user has met step goal for today
-							if (activities.summary.steps < activities.goals.steps) {
-								callback(null, data);
-							} else {
+                },
+                
+                function (data, callback) {
+                    // check the last notification time and see if we are inside the user's reminder window
+                    if (data.lastNotificationTime < moment.utc().subtract(data.inactivityThreshold * 15, 'minutes') &&
+                        moment.utc().tz(data.timezone).hour() >= data.startTime &&
+                        moment.utc().tz(data.timezone).hour() < data.endTime) {
+                        callback(null, data);
+                    } else {                    
+                        callback(new Error('Outside of reminder window or inside of notification threshold. No action required.'));
+                    }
+                },
+                
+                function (data, callback) {                    
+                    // check if we need to check for the user's step goal
+                    if (data.dontSendRemindersAfterGoal) {
+                        // fetch the user's stats for today
+                        fitbit.getActivities(data, next).then(function(activities) {                                        
+                            // check if user has met step goal for today
+                            if (activities.summary.steps < activities.goals.steps) {
+                                callback(null, data);
+                            } else {
                                 callback(new Error('User has not met step goal for today. No action required.'));
                             }
-						});
-					} else {					
-					    callback(null, data);
-                    }
-				},
-				
-				function (data, callback) {
-                    // fetch the user's activity timeseries data
-					fitbit.getTimeseries(data, next).then(function(timeseries) {
-						var sedentaryCount = 0;
-
-						// loop through the timeseries data to find how long user has been sedentary
-						for (var j = timeseries['activities-calories-intraday'].dataset.length - 1; j >= 0; j--) {
-							if (timeseries['activities-calories-intraday'].dataset[j].level == 0) {
-								sedentaryCount++;
-							} else {
-								break;
-							}
-						}
-						
-						callback(null, sedentaryCount, data);
-					});
-				},
-				
-				function (sedentaryCount, data, callback) {
-                    // check if user has been sedentary for too long
-					if (sedentaryCount > data.inactivityThreshold) {
-						var reminder = generateReminder(data);
-
-						// check if phone number is verified
-						if (data.isPhoneNumberVerified) {
-							console.log('Sending inactivity reminder for ' + data.encodedId);
-							
-							// send a text message to notify the user
-							twilio.sendMessage(data, reminder, next);
-
-							data.lastNotificationTime = moment.utc();
-
-							data.save();
-                            
-                            callback(null, data);
-						} else {
-                            callback(null, data);
-                        }
-					} else {
+                        });
+                    } else {                    
                         callback(null, data);
                     }
-				},
-				
-				function(data, callback) {
-					// check if user's account is nearing expiry
-					if (data.expirationDate <= moment.utc().add(1, 'weeks')) {
-						// check if phone number is verified
-						if (data.isPhoneNumberVerified) {
-							console.log('Sending account expiration notice for ' + data.encodedId);
-							
-							// send a text message to notify the user
-							twilio.sendMessage(data, 'Your Fitminder account will expire ' + moment(data.expirationDate).fromNow() + '! Login at http://' + process.env.HOSTNAME + ' soon to renew your membership.', next);
-						}
-					}
-				}
-				
-			], function (err, result) {
-				if (err) {
-					console.error(err);
+                },
+                
+                function (data, callback) {
+                    // fetch the user's activity timeseries data
+                    fitbit.getTimeseries(data, next).then(function(timeseries) {
+                        var sedentaryCount = 0;
+
+                        // loop through the timeseries data to find how long user has been sedentary
+                        for (var j = timeseries['activities-calories-intraday'].dataset.length - 1; j >= 0; j--) {
+                            if (timeseries['activities-calories-intraday'].dataset[j].level == 0) {
+                                sedentaryCount++;
+                            } else {
+                                break;
+                            }
+                        }
+                        
+                        callback(null, sedentaryCount, data);
+                    });
+                },
+                
+                function (sedentaryCount, data, callback) {
+                    // check if user has been sedentary for too long
+                    if (sedentaryCount > data.inactivityThreshold) {
+                        var reminder = generateReminder(data);
+
+                        // check if phone number is verified
+                        if (data.isPhoneNumberVerified) {
+                            console.log('Sending inactivity reminder for ' + data.encodedId);
+                            
+                            // send a text message to notify the user
+                            twilio.sendMessage(data, reminder, next);
+
+                            data.lastNotificationTime = moment.utc();
+
+                            data.save();
+                            
+                            callback(null, data);
+                        } else {
+                            callback(null, data);
+                        }
+                    } else {
+                        callback(new Error('User has not met exceeded inactivity threshold. No action required.'));
+                    }
+                },
+                
+                function(data, callback) {
+                    // check if user's account is nearing expiry
+                    if (data.expirationDate <= moment.utc().add(1, 'weeks')) {
+                        // check if phone number is verified
+                        if (data.isPhoneNumberVerified) {
+                            console.log('Sending account expiration notice for ' + data.encodedId);
+                            
+                            // send a text message to notify the user
+                            twilio.sendMessage(data, 'Your Fitminder account will expire ' + moment(data.expirationDate).fromNow() + '! Login at http://' + process.env.HOSTNAME + ' soon to renew your membership.', next);
+                        }
+                    }
+                }
+                
+            ], function (err, result) {
+                if (err) {
+                    console.error(err);
                     
                     if (result)
-					   return next(err);
-				}
-			});
-			
-		});
+                       return next(err);
+                }
+            });
+            
+        });
 
         // acknowledge the notification
         res.set('Content-Type', 'text/plain');
