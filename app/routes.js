@@ -295,6 +295,17 @@ module.exports = function(app, passport) {
 					});
 				},
 				
+				function (data, callback) {
+                    // check the last notification time and see if we are inside the user's reminder window
+					if (data.lastNotificationTime < moment.utc().subtract(data.inactivityThreshold * 15, 'minutes') &&
+						moment.utc().tz(data.timezone).hour() >= data.startTime &&
+						moment.utc().tz(data.timezone).hour() < data.endTime) {
+						callback(null, data);
+					} else {					
+					    callback(new Error('Outside of reminder window or inside of notification threshold. No action required.'));
+                    }
+				},
+				
 				function(data, callback) {
 					// check if user has an active account
 					if (data.expirationDate > moment.utc()) {
@@ -312,17 +323,6 @@ module.exports = function(app, passport) {
                         }
                         
 					    callback(new Error('The user\'s account has expired. No action required.'));
-                    }
-				},
-				
-				function (data, callback) {
-                    // check the last notification time and see if we are inside the user's reminder window
-					if (data.lastNotificationTime < moment.utc().subtract(data.inactivityThreshold * 15, 'minutes') &&
-						moment.utc().tz(data.timezone).hour() >= data.startTime &&
-						moment.utc().tz(data.timezone).hour() < data.endTime) {
-						callback(null, data);
-					} else {					
-					    callback(new Error('Outside of reminder window or inside of notification threshold. No action required.'));
                     }
 				},
 				
