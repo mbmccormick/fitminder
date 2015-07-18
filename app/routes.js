@@ -57,9 +57,9 @@ module.exports = function(app, passport) {
 
         // find the current user's profile
         query.findOne(function(err, data) {            
-            if (err) {
+            if (err || !data) {
                 console.error('Failed to retrieve data for query ' + query);
-                return next(err);
+                return next(err || new Error('Failed to retrieve data for query ' + query));
             }
             
             var phoneNumber = phone(req.body.phoneNumber);
@@ -103,9 +103,9 @@ module.exports = function(app, passport) {
 
         // find the current user's profile
         query.findOne(function(err, data) {            
-            if (err) {
+            if (err || !data) {
                 console.error('Failed to retrieve data for query ' + query);
-                return next(err);
+                return next(err || new Error('Failed to retrieve data for query ' + query));
             }
             
             // delete the subscription for this user
@@ -130,10 +130,10 @@ module.exports = function(app, passport) {
         var query = Profile.where({ encodedId: req.user.encodedId });
 
         // find the current user's profile
-        query.findOne(function(err, data) {
-            if (err) {
+        query.findOne(function(err, data) {            
+            if (err || !data) {
                 console.error('Failed to retrieve data for query ' + query);
-                return next(err);
+                return next(err || new Error('Failed to retrieve data for query ' + query));
             }
             
             var phoneNumber = phone(req.body.phoneNumber);
@@ -177,9 +177,9 @@ module.exports = function(app, passport) {
 
         // find the current user's profile
         query.findOne(function(err, data) {            
-            if (err) {
+            if (err || !data) {
                 console.error('Failed to retrieve data for query ' + query);
-                return next(err);
+                return next(err || new Error('Failed to retrieve data for query ' + query));
             }
             
             // create the charge for this token
@@ -224,17 +224,14 @@ module.exports = function(app, passport) {
                 var query = Profile.where({ phoneNumber: phoneNumber[0] });
                 
                 // find the user associated with this notification
-                query.findOne(function(err, data) {
-                    if (err) {
+                query.findOne(function(err, data) {            
+                    if (err || !data) {
                         // send a text message to confirm receipt
                         twilio.sendGenericMessage(phoneNumber[0], 'Hey there! We didn\'t understand your text message. For more information, please visit http://' + process.env.HOSTNAME + '.', next);
                         
-                        callback(err, true);
+                        console.error('Failed to retrieve data for query ' + query);
+                        callback(err || new Error('Failed to retrieve data for query ' + query), true);
                     } else {                    
-                        data.lastSyncTime = moment.utc();
-    
-                        data.save();
-                        
                         callback(null, data);
                     }
                 });
@@ -282,17 +279,16 @@ module.exports = function(app, passport) {
                     var query = Profile.where({ encodedId: item.ownerId });
                     
                     // find the user associated with this notification
-                    query.findOne(function(err, data) {
-                        if (err) {
-                            callback(err, true);
-                        } else if (data) {                        
+                    query.findOne(function(err, data) {            
+                        if (err || !data) {
+                            console.error('Failed to retrieve data for query ' + query);
+                            callback(err || new Error('Failed to retrieve data for query ' + query), true);
+                        } else {
                             data.lastSyncTime = moment.utc();
     
                             data.save();
                             
                             callback(null, data);
-                        } else {
-                            callback (new Error ("TODO: fix this"), true);
                         }
                     });
                 },
