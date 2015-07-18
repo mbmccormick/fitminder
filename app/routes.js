@@ -285,12 +285,14 @@ module.exports = function(app, passport) {
                     query.findOne(function(err, data) {
                         if (err) {
                             callback(err, true);
-                        } else {                        
+                        } else if (data) {                        
                             data.lastSyncTime = moment.utc();
     
                             data.save();
                             
                             callback(null, data);
+                        } else {
+                            callback (new Error ("TODO: fix this"), true);
                         }
                     });
                 },
