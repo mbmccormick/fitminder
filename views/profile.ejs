@@ -16,6 +16,19 @@
     <p id="phoneVerificationStatus" class="text-danger">Your phone number has not yet been verified.</p>
     <% } %>
     <% } %>
+    
+    <div class="spacer spacer-sm"></div>
+    
+    <div class="form-group form-group-lg">
+        <label class="control-label" for="iftttSecretKey">IFTTT Secret Key</label>
+        <input class="form-control" id="iftttSecretKey" name="iftttSecretKey" value="<%= user.iftttSecretKey %>">
+    </div>
+    
+    <% if (user.iftttSecretKey) { %>
+    <p id="phoneVerificationStatus" class="text-warning">Notifications are being sent to IFTTT's Maker Channel with Event Name <var>fitminder</var>, instead of your phone number. Remove your IFTTT Secret Key to disable this functionality.</p>
+    <% } else { %>
+    <p id="phoneVerificationStatus" class="text-muted">Enter the Secret Key for your <a href="http://ifttt.com/maker" target="_blank">IFTTT Maker Channel</a> here to send notifications to IFTTT instead of your phone number.</p>
+    <% } %>
 
     <div class="spacer spacer-sm"></div>
 

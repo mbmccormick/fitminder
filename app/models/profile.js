@@ -13,6 +13,7 @@ var ProfileSchema  = new Schema({
     strideLengthWalking: Number,
     phoneNumber: String,
     isPhoneNumberVerified: Boolean,
+    iftttSecretKey: String,
     inactivityThreshold: Number,
     startTime: Number,
     endTime: Number,

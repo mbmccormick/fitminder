@@ -1,6 +1,7 @@
 var Profile = require('./models/profile');
 var fitbit = require('./fitbit');
 var twilio = require('./twilio');
+var ifttt = require('./ifttt');
 var stripe = require('./stripe');
 
 var async = require('async');
@@ -82,6 +83,7 @@ module.exports = function(app, passport) {
                 twilio.sendMessage(data, 'Hey, ' + data.nickname + '! Thanks for updating your phone number with Fitminder. Please reply \"yes\" to confirm your new number.', next);
             }
             
+            data.iftttSecretKey = req.body.iftttSecretKey;
             data.inactivityThreshold = req.body.inactivityThreshold;
             data.startTime = req.body.startTime;
             data.endTime = req.body.endTime;
@@ -368,8 +370,13 @@ module.exports = function(app, passport) {
                         if (data.isPhoneNumberVerified) {
                             console.log('Sending inactivity reminder for ' + data.encodedId);
                             
-                            // send a text message to notify the user
-                            twilio.sendMessage(data, reminder, next);
+                            if (data.iftttSecretKey) {
+                                // send an event to IFTTT
+                                ifttt.sendEvent(data, reminder, sedentaryCount * 15, null, next);
+                            } else {                            
+                                // send a text message to notify the user
+                                twilio.sendMessage(data, reminder, next);
+                            }
 
                             data.lastNotificationTime = moment.utc();
 
@@ -380,7 +387,7 @@ module.exports = function(app, passport) {
                             callback(null, data);
                         }
                     } else {
-                        callback(new Error('User has not met exceeded inactivity threshold. No action required.'));
+                        callback(new Error('User has not exceeded inactivity threshold. No action required.'));
                     }
                 },
                 
