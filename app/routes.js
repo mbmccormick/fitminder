@@ -440,8 +440,10 @@ module.exports = function(app, passport) {
         
         console.error(error);
 
-        res.status(500);
-        res.render('500', { exception: error });
+        if (res.headerSent == false) {
+            res.status(500);
+            res.render('500', { exception: error });
+        }
 
         next(error);
 
