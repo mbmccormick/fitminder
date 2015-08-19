@@ -51,6 +51,8 @@
             <option value="23"<% if (user.endTime == 23) { %>selected<% } %>>11:00 PM</option>
         </select>
     </div>
+    
+    <p class="text-muted">Your timezone is currently set to <%= user.timezone %>. You can change this on the Fitbit website.</p>
 
     <div class="checkbox">
         <label>

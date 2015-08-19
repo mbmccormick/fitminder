@@ -22,6 +22,7 @@ p.lead b {
   color: #333333;
 }
 p.subhero {
+  margin: 26px 0;
   font-size: 115%;
 }
 p.lead b {
@@ -31,9 +32,6 @@ p.lead b {
   width: auto;
   max-width: 800px;
   padding: 0 15px;
-}
-.container .text-muted {
-  margin: 26px 0;
 }
 .spacer {
 }
@@ -63,6 +61,9 @@ p.lead b {
 }
 .footer a {
   color: #666666;  
+}
+.footer .text-muted {
+  margin: 26px 0;
 }
 @media screen and (max-width:767px) {
   h1 small {
