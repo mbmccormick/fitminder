@@ -81,7 +81,7 @@
 
 <div class="spacer spacer-lg"></div>
 
-<p>The last time we received data from Fitbit for your account was <strong><%= fromNow(user.lastSyncTime) %></strong>. The last notification was sent to your phone <strong><%= fromNow(user.lastNotificationTime) %></strong>.</p>
+<p>The last time we received data from Fitbit for your account was <strong><%= fromNow(user.lastSyncTime) %></strong>. The last notification was sent to <% if (user.iftttSecretKey) { %>IFTTT<% } else { %>your phone<% } %> <strong><%= fromNow(user.lastNotificationTime) %></strong>.</p>
 
 <div class="spacer spacer-sm"></div>
 
