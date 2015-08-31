@@ -10,7 +10,7 @@ var moment = require('moment-timezone');
 
 module.exports = function(app, passport) {
 
-    app.get('/', function(req, res, next) {
+    app.get('/', ensureHostname, function(req, res, next) {
         
         if (req.user) {
             res.redirect('/profile');
@@ -450,6 +450,14 @@ module.exports = function(app, passport) {
     });
 
 };
+
+function ensureHostname(req, res, next) {
+    if (req.headers.host === process.env.HOSTNAME) {
+        return next();
+	}
+
+	res.redirect("http://" + process.env.HOSTNAME + req.url);
+}
 
 function ensureSecured(req, res, next) {
     if (process.env.REQUIRE_SSL) {
