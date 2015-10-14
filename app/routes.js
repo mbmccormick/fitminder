@@ -241,13 +241,20 @@ module.exports = function(app, passport) {
             
             function(data, callback) {
                 // check to see if the user correctly verified their number
-                if (req.body.Body.trim().toLowerCase() == 'yes') {
+                if (req.body.Body.toLowerCase().trim() == 'yes') {
                     data.isPhoneNumberVerified = true;
                     
                     data.save();
                     
                     // send a text message to confirm number verification
                     twilio.sendMessage(data, 'Awesome. Your phone number has been verified!', next);
+                } else if (req.body.Body.toLowerCase().indexOf('stop') > -1) {
+                    data.isPhoneNumberVerified = false;
+                    
+                    data.save();
+                    
+                    // send a text message to confirm number verification
+                    twilio.sendMessage(data, 'Sorry to see you go! Your account has been deactivated.', next);
                 } else {
                     // send a text message to confirm receipt
                     twilio.sendGenericMessage(data.phoneNumber, 'Hey there! We didn\'t understand your text message. For more information, please visit http://' + process.env.HOSTNAME + '.', next);
