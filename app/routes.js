@@ -285,6 +285,8 @@ module.exports = function(app, passport) {
             async.waterfall([
             
                 function(callback) {
+                    console.log('Received notification payload for ' + item.ownerId);
+                    
                     var query = Profile.where({ encodedId: item.ownerId });
                     
                     // find the user associated with this notification
@@ -317,6 +319,9 @@ module.exports = function(app, passport) {
 
                             data.save();
                         }
+                            
+                        // delete the subscription for this user
+                        fitbit.deleteSubscription(data, next);
                         
                         callback(new Error('The user\'s account has expired. No action required.'));
                     }
