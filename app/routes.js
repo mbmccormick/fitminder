@@ -468,7 +468,8 @@ function ensureHostname(req, res, next) {
 
 function ensureSecured(req, res, next) {
     if (process.env.REQUIRE_SSL) {
-        if (req.headers["x-forwarded-proto"] === "https") {
+        if (req.headers["x-forwarded-proto"] === "https" ||
+            req.headers['x-arr-ssl']) {
             return next();
         }
         
