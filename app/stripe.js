@@ -4,7 +4,7 @@ exports.createCharge = function(profile, token, next) {
     console.log('Attempting to create charge for ' + profile.encodedId);
     
     return stripe.charges.create({
-            amount: 1000,
+            amount: 1200,
             currency: "usd",
             source: token,
             description: "Fitminder - 1 Year Membership",
