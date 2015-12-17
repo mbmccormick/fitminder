@@ -1,11 +1,11 @@
 var FitbitApiClient = require('fitbit-node');
 
 exports.createSubscription = function(profile, next) {
-    console.log('Attempting to create subscription for ' + profile.encodedId);
+    console.log('Attempting to create subscription for ' + profile.id);
     
     var client = new FitbitApiClient(process.env.FITBIT_CONSUMER_KEY, process.env.FITBIT_CONSUMER_SECRET);
 
-    return client.requestResource('/activities/apiSubscriptions/' + profile.encodedId + '.json', 'POST', profile.oauthToken, profile.oauthTokenSecret).then(function(results) {
+    return client.requestResource('/activities/apiSubscriptions/' + profile.id + '.json', 'POST', profile.oauthToken, profile.oauthTokenSecret).then(function(results) {
         if (results[1].statusCode != 200 &&
             results[1].statusCode != 201) {
             console.error('Failed');
@@ -21,11 +21,11 @@ exports.createSubscription = function(profile, next) {
 }
 
 exports.deleteSubscription = function(profile, next) {
-    console.log('Attempting to delete subscription for ' + profile.encodedId);
+    console.log('Attempting to delete subscription for ' + profile.id);
     
     var client = new FitbitApiClient(process.env.FITBIT_CONSUMER_KEY, process.env.FITBIT_CONSUMER_SECRET);
 
-    return client.requestResource('/activities/apiSubscriptions/' + profile.encodedId + '.json', 'DELETE', profile.oauthToken, profile.oauthTokenSecret).then(function(results) {
+    return client.requestResource('/activities/apiSubscriptions/' + profile.id + '.json', 'DELETE', profile.oauthToken, profile.oauthTokenSecret).then(function(results) {
         if (results[1].statusCode != 204 &&
             results[1].statusCode != 404) {
             console.error('Failed');
@@ -41,7 +41,7 @@ exports.deleteSubscription = function(profile, next) {
 }
 
 exports.getTimeseries = function(profile, next) {
-    console.log('Attempting to fetch timeseries data for ' + profile.encodedId);
+    console.log('Attempting to fetch timeseries data for ' + profile.id);
     
     var client = new FitbitApiClient(process.env.FITBIT_CONSUMER_KEY, process.env.FITBIT_CONSUMER_SECRET);
 
@@ -60,7 +60,7 @@ exports.getTimeseries = function(profile, next) {
 }
 
 exports.getActivities = function(profile, next) {
-    console.log('Attempting to fetch activity stats for ' + profile.encodedId);
+    console.log('Attempting to fetch activity stats for ' + profile.id);
     
     var client = new FitbitApiClient(process.env.FITBIT_CONSUMER_KEY, process.env.FITBIT_CONSUMER_SECRET);
 

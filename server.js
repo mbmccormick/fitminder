@@ -8,7 +8,9 @@ var partials = require('express-partials');
 var bodyParser = require('body-parser');
 var multer = require('multer');
 
-var mongoose = require('mongoose');
+var documentdb = require('documentdb').DocumentClient;
+var Profile = require('./app/models/profile');
+
 var passport = require('passport');
 var moment = require('moment-timezone');
 
@@ -27,9 +29,14 @@ app.use(multer());
 app.use(partials());
 app.use(express.static(path.join(__dirname, 'public'), { maxAge: 1000 * 60 * 60 * 24 * 7}));
 
-mongoose.connect(process.env.DATABASE_URL);
+var documentDbClient = new documentdb(process.env.DOCUMENTDB_HOST, {
+    masterKey: process.env.DOCUMENTDB_AUTH_KEY
+});
 
-require('./config/passport')(passport);
+var profile = new Profile(documentDbClient, 'fitminder', 'profiles');
+profile.initialize();
+
+require('./config/passport')(profile, passport);
 
 app.use(session({
         secret: 'fitminder',
@@ -60,14 +67,14 @@ app.locals.subtract = function (date, amount, unit) {
 }
 
 // routes ======================================================================
-require('./app/routes')(app, passport);
+require('./app/routes')(app, profile, passport);
 
 // error handling ==============================================================
 var raygunClient = new raygun.Client().init({ apiKey: process.env.RAYGUN_API_KEY });
 
 raygunClient.user = function (req) {
     if (req.user) {
-        return req.user.encodedId;
+        return req.user.id;
     }
 }
 

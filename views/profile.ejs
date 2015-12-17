@@ -81,15 +81,15 @@
 
 <div class="spacer spacer-lg"></div>
 
-<p>The last time we received data from Fitbit for your account was <strong><%= fromNow(user.lastSyncTime) %></strong>. The last notification was sent to <% if (user.iftttSecretKey) { %>IFTTT<% } else { %>your phone<% } %> <strong><%= fromNow(user.lastNotificationTime) %></strong>.</p>
+<p>The last time we received data from Fitbit for your account was <strong><%= fromNow(new Date(user.lastSyncTime)) %></strong>. The last notification was sent to <% if (user.iftttSecretKey) { %>IFTTT<% } else { %>your phone<% } %> <strong><%= fromNow(new Date(user.lastNotificationTime)) %></strong>.</p>
 
 <div class="spacer spacer-sm"></div>
 
 <form action="/profile/billing" method="post">
-    <% if (user.expirationDate > add(utc(), 30, 'days')) { %>
-    <p>Your Fitminder account will expire in <strong><%= fromNow(user.expirationDate) %></strong>. We'll send you a text message when it's time to renew your membership.</p>
-    <% } else if (user.expirationDate > utc()) { %>
-    <p>Your Fitminder account will expire in <strong><%= fromNow(user.expirationDate) %></strong>. You can <a id="paymentLink" href="#">renew your membership</a> now or we'll send you a text message to remind you when this gets closer.</p>
+    <% if (new Date(user.expirationDate) > add(utc(), 30, 'days')) { %>
+    <p>Your Fitminder account will expire in <strong><%= fromNow(new Date(user.expirationDate)) %></strong>. We'll send you a text message when it's time to renew your membership.</p>
+    <% } else if (new Date(user.expirationDate) > utc()) { %>
+    <p>Your Fitminder account will expire in <strong><%= fromNow(new Date(user.expirationDate)) %></strong>. You can <a id="paymentLink" href="#">renew your membership</a> now or we'll send you a text message to remind you when this gets closer.</p>
     <% } else { %>
     <p>Your Fitminder account has expired. <a id="paymentLink" href="#">Renew your membership</a> now to start receiving reminders again.</p>
     <% } %>

@@ -1,19 +1,17 @@
 var FitbitStrategy = require('passport-fitbit2').Strategy;
-
-var Profile = require('../app/models/profile');
 var fitbit = require('../app/fitbit');
 
 var moment = require('moment-timezone');
 
-module.exports = function(passport) {
+module.exports = function(Profile, passport) {
 
     passport.serializeUser(function(user, done) {
         done(null, user.id);
     });
 
     passport.deserializeUser(function(id, done) {
-        Profile.findById(id, function(err, profile) {
-            done(err, profile);
+        Profile.findById(id, function(err, data) {
+            done(err, data);
         });
     });
 
@@ -26,18 +24,18 @@ module.exports = function(passport) {
             process.nextTick(function() {
 
                 // look up user's profile in database or create one if they don't exist
-                Profile.findOrCreate({ encodedId: profile.id }, function(err, data, created) {
+                Profile.findOrCreate(profile.id, function(err, data, created) {
                     if (err) {
                         return done(err);
                     }
-                    
+
                     data.oauthToken = token;
                     data.oauthTokenSecret = tokenSecret;
                     data.fullName = profile._json.user.fullName;
                     data.nickname = profile._json.user.nickname || profile._json.user.fullName.split(' ')[0];
                     data.timezone = profile._json.user.timezone;
                     data.strideLengthWalking = profile._json.user.strideLengthWalking;
-                    
+
                     // if this is a new user, set some additional defaults
                     if (created) {
                         console.log('Creating user account for ' + profile.id);
@@ -54,12 +52,12 @@ module.exports = function(passport) {
                     } else {
                         console.log('New dashboard session for ' + profile.id);
                     }
-                    
-                    data.save();
-                
+
+                    Profile.update(data);
+
                     // create a subscription for the user
                     fitbit.createSubscription(data, done);
-                    
+
                     return done(null, data);
                 });
             });
