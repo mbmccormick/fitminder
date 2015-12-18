@@ -158,9 +158,9 @@ module.exports = function(app, Profile, passport) {
             // create the charge for this token
             stripe.createCharge(data, req.body.token, next).then(function(charge) {
                 if (charge.status == 'succeeded') {
-                    console.log('Extending account expiration date for ' + data.id);                
+                    console.log('Extending account expiration date for ' + data.id);
                     data.expirationDate = moment(new Date(data.expirationDate)).add(1, 'years');
-                    
+
                     Profile.update(data);
 
                     // update the user's profile currently stored in session
@@ -227,10 +227,10 @@ module.exports = function(app, Profile, passport) {
                     if (err || !data) {
                         // send a text message to confirm receipt
                         twilio.sendGenericMessage(phoneNumber[0], 'Hey there! We didn\'t understand your text message. For more information, please visit http://' + process.env.HOSTNAME + '.', next);
-                        
+
                         console.error('Failed to retrieve data for ' + phoneNumber[0]);
                         callback(err || new Error('Failed to retrieve data for ' + phoneNumber[0]), true);
-                    } else {                    
+                    } else {
                         callback(null, data);
                     }
                 });
@@ -328,16 +328,16 @@ module.exports = function(app, Profile, passport) {
                         moment.utc().tz(data.timezone).hour() >= data.startTime &&
                         moment.utc().tz(data.timezone).hour() < data.endTime) {
                         callback(null, data);
-                    } else {                    
+                    } else {
                         callback(new Error('Outside of reminder window or inside of notification threshold. No action required.'));
                     }
                 },
 
-                function (data, callback) {                    
+                function (data, callback) {
                     // check if we need to check for the user's step goal
                     if (data.dontSendRemindersAfterGoal) {
                         // fetch the user's stats for today
-                        fitbit.getActivities(data, next).then(function(activities) {                                        
+                        fitbit.getActivities(data, next).then(function(activities) {
                             // check if user has met step goal for today
                             if (activities.summary.steps < activities.goals.steps) {
                                 callback(null, data);
@@ -345,7 +345,7 @@ module.exports = function(app, Profile, passport) {
                                 callback(new Error('User has not met step goal for today. No action required.'));
                             }
                         });
-                    } else {                    
+                    } else {
                         callback(null, data);
                     }
                 },
@@ -380,7 +380,7 @@ module.exports = function(app, Profile, passport) {
                             if (data.iftttSecretKey) {
                                 // send an event to IFTTT
                                 ifttt.sendEvent(data, reminder, sedentaryCount * 15, null, next);
-                            } else {                            
+                            } else {
                                 // send a text message to notify the user
                                 twilio.sendMessage(data, reminder, next);
                             }

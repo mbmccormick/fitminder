@@ -39,7 +39,7 @@ module.exports = function(Profile, passport) {
                     // if this is a new user, set some additional defaults
                     if (created) {
                         console.log('Creating user account for ' + profile.id);
-                        
+
                         data.phoneNumber = null;
                         data.isPhoneNumberVerified = false;
                         data.inactivityThreshold = 4; // 1 hour

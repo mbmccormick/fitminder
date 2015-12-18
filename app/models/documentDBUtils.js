@@ -1,5 +1,5 @@
 var documentDbUtils = {
-    
+
     getOrCreateDatabase: function(client, databaseId, callback) {
         var querySpec = {
             query: 'SELECT * FROM root r WHERE r.id=@id',
@@ -35,12 +35,12 @@ var documentDbUtils = {
                 name: '@id',
                 value: collectionId
             }]
-        };             
+        };
 
         client.queryCollections(databaseLink, querySpec).toArray(function(err, results) {
             if (err) {
                 callback(err);
-            } else {        
+            } else {
                 if (results.length === 0) {
                     var collectionSpec = {
                         id: collectionId
