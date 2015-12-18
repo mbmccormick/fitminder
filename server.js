@@ -48,7 +48,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.locals.fromNow = function (date) {
-    if (date)
+    if (date && date.getTime() != 0)
         return moment(date).fromNow();
     else
         return 'never';
