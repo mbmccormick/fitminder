@@ -35,6 +35,11 @@ Profile.prototype = {
 
     find: function(querySpec, callback) {
         var self = this;
+        
+        if (self.database == null ||
+            self.collection == null) {
+            self.initialize();
+        }
 
         self.client.queryDocuments(self.collection._self, querySpec).toArray(function(err, results) {
             if (err) {
@@ -47,6 +52,11 @@ Profile.prototype = {
 
     findById: function(id, callback) {
         var self = this;
+        
+        if (self.database == null ||
+            self.collection == null) {
+            self.initialize();
+        }
 
         var querySpec = {
             query: 'SELECT * FROM root r WHERE r.id=@id',
@@ -67,6 +77,11 @@ Profile.prototype = {
 
     findOne: function(querySpec, callback) {
         var self = this;
+        
+        if (self.database == null ||
+            self.collection == null) {
+            self.initialize();
+        }
 
         self.client.queryDocuments(self.collection._self, querySpec).toArray(function(err, results) {
             if (err) {
@@ -106,6 +121,11 @@ Profile.prototype = {
 
     create: function(item, callback) {
         var self = this;
+        
+        if (self.database == null ||
+            self.collection == null) {
+            self.initialize();
+        }
 
         self.client.createDocument(self.collection._self, item, function(err, document) {
             if (err) {
