@@ -289,13 +289,13 @@ module.exports = function(app, Profile, passport) {
                         if (err || !data) {
                             console.error('Failed to retrieve data for ' + item.ownerId);
                             callback(err || new Error('Failed to retrieve data for ' + item.ownerId), true);
+                        } else {
+                            data.lastSyncTime = moment.utc();
+
+                            Profile.update(data);
+
+                            callback(null, data);
                         }
-
-                        data.lastSyncTime = moment.utc();
-
-                        Profile.update(data);
-
-                        callback(null, data);
                     });
                 },
 
