@@ -4,6 +4,7 @@ var ifttt = require('./ifttt');
 var stripe = require('./stripe');
 
 var async = require('async');
+var _ = require('lodash');
 var phone = require('phone');
 var moment = require('moment-timezone');
 
@@ -275,8 +276,8 @@ module.exports = function(app, Profile, passport) {
 
     app.post('/api/fitbit/notification', function(req, res, next) {
 
-        // process the individual notifications
-        req.body.forEach(function (item) {
+        // process the individual unique notifications
+        _.uniq(req.body, 'ownerId').forEach(function (item) {
 
             // spawn the asynchronous waterfall handler
             async.waterfall([
