@@ -5,7 +5,7 @@ exports.createSubscription = function(profile, next) {
 
     var client = new FitbitApiClient(process.env.FITBIT_CONSUMER_KEY, process.env.FITBIT_CONSUMER_SECRET);
 
-    return client.requestResource('/activities/apiSubscriptions/' + profile.id + '.json', 'POST', profile.oauthToken, profile.oauthTokenSecret).then(function(results) {
+    return client.post('/activities/apiSubscriptions/' + profile.id + '.json', profile.oauthToken, profile.oauthTokenSecret).then(function(results) {
         if (results[1].statusCode != 200 &&
             results[1].statusCode != 201) {
             console.error('Failed');
@@ -25,7 +25,7 @@ exports.deleteSubscription = function(profile, next) {
 
     var client = new FitbitApiClient(process.env.FITBIT_CONSUMER_KEY, process.env.FITBIT_CONSUMER_SECRET);
 
-    return client.requestResource('/activities/apiSubscriptions/' + profile.id + '.json', 'DELETE', profile.oauthToken, profile.oauthTokenSecret).then(function(results) {
+    return client.delete('/activities/apiSubscriptions/' + profile.id + '.json', profile.oauthToken, profile.oauthTokenSecret).then(function(results) {
         if (results[1].statusCode != 204 &&
             results[1].statusCode != 404) {
             console.error('Failed');
@@ -45,7 +45,7 @@ exports.getTimeseries = function(profile, next) {
 
     var client = new FitbitApiClient(process.env.FITBIT_CONSUMER_KEY, process.env.FITBIT_CONSUMER_SECRET);
 
-    return client.requestResource('/activities/calories/date/today/1d/15min.json', 'GET', profile.oauthToken, profile.oauthTokenSecret).then(function(results) {
+    return client.get('/activities/calories/date/today/1d/15min.json', profile.oauthToken, profile.oauthTokenSecret).then(function(results) {
         if (results[1].statusCode != 200) {
             console.error('Failed');
             return next(new Error('Failed to retrieve Fitbit timeseries data'));
@@ -64,7 +64,7 @@ exports.getActivities = function(profile, next) {
 
     var client = new FitbitApiClient(process.env.FITBIT_CONSUMER_KEY, process.env.FITBIT_CONSUMER_SECRET);
 
-    return client.requestResource('/activities/date/today.json', 'GET', profile.oauthToken, profile.oauthTokenSecret).then(function(results) {
+    return client.get('/activities/date/today.json', profile.oauthToken, profile.oauthTokenSecret).then(function(results) {
         if (results[1].statusCode != 200) {
             console.error('Failed');
             return next(new Error('Failed to retrieve Fitbit activity stats'));

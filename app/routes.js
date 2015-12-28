@@ -343,7 +343,7 @@ module.exports = function(app, Profile, passport) {
                             if (activities.summary.steps < activities.goals.steps) {
                                 callback(null, data);
                             } else {
-                                callback(new Error('User has not met step goal for today. No action required.'));
+                                callback(new Error('User has met step goal for today. No action required.'));
                             }
                         });
                     } else {

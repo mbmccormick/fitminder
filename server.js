@@ -6,7 +6,6 @@ var session = require('cookie-session');
 var ejs = require('ejs');
 var partials = require('express-partials');
 var bodyParser = require('body-parser');
-var multer = require('multer');
 
 var documentdb = require('documentdb').DocumentClient;
 var Profile = require('./app/models/profile');
@@ -25,7 +24,6 @@ app.set('view engine', 'ejs');
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(multer());
 app.use(partials());
 app.use(express.static(path.join(__dirname, 'public'), { maxAge: 1000 * 60 * 60 * 24 * 7}));
 
