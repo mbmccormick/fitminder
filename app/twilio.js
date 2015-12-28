@@ -3,7 +3,7 @@ var TwilioApiClient = require('twilio')(process.env.TWILIO_ACCOUNT_SID, process.
 exports.sendMessage = function(profile, message, next) {
     console.log('Attempting to send message to ' + profile.phoneNumber);
 
-    TwilioApiClient.sendMessage({
+    return TwilioApiClient.sendMessage({
             to: profile.phoneNumber,
             from: process.env.TWILIO_PHONE_NUMBER,
             body: message
@@ -21,7 +21,7 @@ exports.sendMessage = function(profile, message, next) {
 exports.sendGenericMessage = function(phoneNumber, message, next) {
     console.log('Attempting to send generic message to ' + phoneNumber);
 
-    TwilioApiClient.sendMessage({
+    return TwilioApiClient.sendMessage({
             to: phoneNumber,
             from: process.env.TWILIO_PHONE_NUMBER,
             body: message

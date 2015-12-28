@@ -1,7 +1,10 @@
 var request = require('request');
+var q = require('q');
 
 exports.sendEvent = function(profile, value1, value2, value3, next) {
     console.log('Attempting to send IFTTT event to ' + profile.iftttSecretKey);
+
+    var deferred = q.defer();
 
     request.post('https://maker.ifttt.com/trigger/fitminder/with/key/' + profile.iftttSecretKey, {
 		form: {
@@ -12,10 +15,15 @@ exports.sendEvent = function(profile, value1, value2, value3, next) {
 	}, function(err, response, body) {
             if (err) {
                 console.error('Failed');
-                return next(err);
+                
+                deferred.reject(next(err));
+            } else {
+                console.log('Succeeded');
+                
+                deferred.resolve();
             }
-
-            console.log('Succeeded');
         }
     );
+    
+    return deferred.promise;
 }

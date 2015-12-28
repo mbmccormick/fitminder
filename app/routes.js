@@ -250,7 +250,7 @@ module.exports = function(app, Profile, passport) {
 
                     Profile.update(data);
 
-                    // send a text message to confirm number verification
+                    // send a text message to acknowledge deactivation
                     twilio.sendMessage(data, 'Sorry to see you go! Your account has been deactivated.', next);
                 } else {
                     // send a text message to confirm receipt
@@ -379,15 +379,19 @@ module.exports = function(app, Profile, passport) {
 
                             if (data.iftttSecretKey) {
                                 // send an event to IFTTT
-                                ifttt.sendEvent(data, reminder, sedentaryCount * 15, null, next);
+                                ifttt.sendEvent(data, reminder, sedentaryCount * 15, null, next).then(function() {
+                                    data.lastNotificationTime = moment.utc();
+
+                                    Profile.update(data);
+                                });
                             } else {
                                 // send a text message to notify the user
-                                twilio.sendMessage(data, reminder, next);
+                                twilio.sendMessage(data, reminder, next).then(function() {
+                                    data.lastNotificationTime = moment.utc();
+
+                                    Profile.update(data);
+                                });
                             }
-
-                            data.lastNotificationTime = moment.utc();
-
-                            Profile.update(data);
 
                             callback(null, data);
                         } else {
