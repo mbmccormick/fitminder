@@ -30,13 +30,13 @@ module.exports = function(app, Profile, passport) {
 
     });
 
-    app.get('/auth/fitbit', passport.authenticate('fitbit'), function(req, res, next) {
+    app.get('/auth/fitbit', passport.authenticate('fitbit', { scope: [ 'activity', 'profile' ] }), function(req, res, next) {
 
         // do nothing
 
     });
 
-    app.get('/auth/fitbit/callback', passport.authenticate('fitbit', { failureRedirect: '/login' }), function(req, res, next) {
+    app.get('/auth/fitbit/callback', passport.authenticate('fitbit', { failureRedirect: '/' }), function(req, res, next) {
 
         res.redirect('/profile');
 
@@ -187,7 +187,7 @@ module.exports = function(app, Profile, passport) {
             }
 
             // delete the subscription for this user
-            fitbit.deleteSubscription(data, next);
+            fitbit.deleteSubscription(Profile, data, next);
 
             Profile.delete(data);
         });
@@ -274,6 +274,17 @@ module.exports = function(app, Profile, passport) {
 
     });
 
+    app.get('/api/fitbit/notification', function(req, res, next) {
+
+        // handle subscriber verification test
+        if (req.query.verify == process.env.FITBIT_VERIFICATION_CODE) {
+            res.status(204).end();
+        } else {
+            res.status(404).end();
+        }
+
+    });
+
     app.post('/api/fitbit/notification', function(req, res, next) {
 
         // process the individual unique notifications
@@ -317,7 +328,7 @@ module.exports = function(app, Profile, passport) {
                         }
 
                         // delete the subscription for this user
-                        fitbit.deleteSubscription(data, next);
+                        fitbit.deleteSubscription(Profile, data, next);
 
                         callback(new Error('The user\'s account has expired. No action required.'));
                     }
@@ -338,7 +349,7 @@ module.exports = function(app, Profile, passport) {
                     // check if we need to check for the user's step goal
                     if (data.dontSendRemindersAfterGoal) {
                         // fetch the user's stats for today
-                        fitbit.getActivities(data, next).then(function(activities) {
+                        fitbit.getActivities(Profile, data, next).then(function(activities) {
                             // check if user has met step goal for today
                             if (activities.summary.steps < activities.goals.steps) {
                                 callback(null, data);
@@ -353,7 +364,7 @@ module.exports = function(app, Profile, passport) {
 
                 function (data, callback) {
                     // fetch the user's activity timeseries data
-                    fitbit.getTimeseries(data, next).then(function(timeseries) {
+                    fitbit.getTimeseries(Profile, data, next).then(function(timeseries) {
                         var sedentaryCount = 0;
 
                         // loop through the timeseries data to find how long user has been sedentary
@@ -466,9 +477,9 @@ module.exports = function(app, Profile, passport) {
 function ensureHostname(req, res, next) {
     if (req.headers.host === process.env.HOSTNAME) {
         return next();
-	}
+    }
 
-	res.redirect("http://" + process.env.HOSTNAME + req.url);
+    res.redirect("http://" + process.env.HOSTNAME + req.url);
 }
 
 function ensureSecured(req, res, next) {
