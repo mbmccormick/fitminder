@@ -14,11 +14,17 @@ module.exports = function(Profile, passport) {
             done(err, data);
         });
     });
+    
+    var callbackURL = 'http://' + process.env.HOSTNAME + '/auth/fitbit/callback';
+    
+    if (process.env.REQUIRE_SSL) {
+        callbackURL = 'https://' + process.env.HOSTNAME + '/auth/fitbit/callback'
+    }
 
     passport.use(new FitbitStrategy({
             clientID: process.env.FITBIT_CLIENT_ID,
             clientSecret: process.env.FITBIT_CLIENT_SECRET,
-            callbackURL: 'http://' + process.env.HOSTNAME + '/auth/fitbit/callback'
+            callbackURL: callbackURL
         },
         function(accessToken, refreshToken, profile, done) {
             // look up user's profile in database or create one if they don't exist
