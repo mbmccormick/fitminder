@@ -1,4 +1,4 @@
-var FitbitApiClient = require('fitbit-node');
+var FitbitApiClient = require('fitbit-node-oauth2');
 
 exports.createSubscription = function(Profile, profile, next) {
     console.log('Attempting to create subscription for ' + profile.id);
