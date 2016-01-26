@@ -59,8 +59,11 @@ module.exports = function(Profile, passport) {
 
                 Profile.update(data);
 
-                // create a subscription for the user
-                fitbit.createSubscription(Profile, data, done);
+                // check if user has an active account
+                if (new Date(data.expirationDate) > moment.utc()) {
+                    // create a subscription for the user
+                    fitbit.createSubscription(Profile, data, done);
+                }
 
                 return done(null, data);
             });

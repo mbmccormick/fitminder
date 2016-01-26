@@ -166,6 +166,9 @@ module.exports = function(app, Profile, passport) {
 
                     // update the user's profile currently stored in session
                     req.user = data;
+                    
+                    // make sure that we have a subscription for the user
+                    fitbit.createSubscription(Profile, data, next);
                 } else {
                     console.error('Failed to validate charge ' + charge.id);
                     return next(new Error('Failed to validate charge ' + charge.id));
@@ -316,6 +319,7 @@ module.exports = function(app, Profile, passport) {
                     if (new Date(data.expirationDate) > moment.utc()) {
                         callback(null, data);
                     } else {
+                        // check if we have notified the user of account expiration
                         if (new Date(data.lastNotificationTime) < new Date(data.expirationDate)) {
                             console.log('Sending final account expiration notice for ' + data.id);
 
