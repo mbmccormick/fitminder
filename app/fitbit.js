@@ -95,7 +95,7 @@ exports.deleteSubscription = function(Profile, profile, next) {
 }
 
 exports.getTimeseries = function(Profile, profile, next) {
-    console.log('Attempting to fetch timeseries results[0] for ' + profile.id);
+    console.log('Attempting to fetch timeseries data for ' + profile.id);
 
     var client = new FitbitApiClient(process.env.FITBIT_CLIENT_ID, process.env.FITBIT_CLIENT_SECRET);
 
@@ -128,7 +128,7 @@ exports.getTimeseries = function(Profile, profile, next) {
             
             if (results[1].statusCode != 200) {
                 console.error('Failed');
-                return next(new Error('Failed to retrieve Fitbit timeseries results[0]'));
+                return next(new Error('Failed to retrieve Fitbit timeseries data'));
             }
     
             console.log('Succeeded');
