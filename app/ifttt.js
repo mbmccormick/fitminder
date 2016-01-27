@@ -15,15 +15,15 @@ exports.sendEvent = function(profile, value1, value2, value3, next) {
 	}, function(err, response, body) {
             if (err) {
                 console.error('Failed');
-                
+
                 deferred.reject(next(err));
             } else {
                 console.log('Succeeded');
-                
+
                 deferred.resolve();
             }
         }
     );
-    
+
     return deferred.promise;
 }

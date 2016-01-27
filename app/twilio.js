@@ -13,16 +13,16 @@ exports.sendMessage = function(profile, message, next) {
         }, function(err, responseData) {
             if (err) {
                 console.error('Failed');
-                
+
                 deferred.reject(next(err));
             } else {
                 console.log('Succeeded');
-                
+
                 deferred.resolve();
             }
         }
     );
-    
+
     return deferred.promise;
 }
 
@@ -38,15 +38,15 @@ exports.sendGenericMessage = function(phoneNumber, message, next) {
         }, function(err, responseData) {
             if (err) {
                 console.error('Failed');
-                
+
                 deferred.reject(next(err));
             } else {
                 console.log('Succeeded');
-                
+
                 deferred.resolve();
             }
         }
     );
-    
+
     return deferred.promise;
 }

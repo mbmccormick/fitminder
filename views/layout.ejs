@@ -10,24 +10,24 @@
         <link href="/css/bootstrap.min.css" rel="stylesheet">
         <link href="/css/layout.css" rel="stylesheet">
         <link href="/css/intltelinput.css" rel="stylesheet">
-        
+
         <script type="text/javascript">
-        
+
             var appInsights = window.appInsights || function(config) {
                 function r(config){t[config]=function(){var i=arguments;t.queue.push(function(){t[config].apply(t,i)})}}var t={config:config},u=document,e=window,o="script",s=u.createElement(o),i,f;for(s.src=config.url||"//az416426.vo.msecnd.net/scripts/a/ai.0.js",u.getElementsByTagName(o)[0].parentNode.appendChild(s),t.cookie=u.cookie,t.queue=[],i=["Event","Exception","Metric","PageView","Trace"];i.length;)r("track"+i.pop());return r("setAuthenticatedUserContext"),r("clearAuthenticatedUserContext"),config.disableExceptionTracking||(i="onerror",r("_"+i),f=e[i],e[i]=function(config,r,u,e,o){var s=f&&f(config,r,u,e,o);return s!==!0&&t["_"+i](config,r,u,e,o),s}),t
             }({
                 instrumentationKey: "d9b1d7fa-2964-4260-8911-1e3ed751c9bb"
             });
-            
+
             window.appInsights = appInsights;
             appInsights.trackPageView();
-            
+
         </script>
 
         <!--[if lt IE 9]>
         <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
         <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-        <![endif]-->        
+        <![endif]-->
 
         <script src="/js/jquery.min.js"></script>
         <script src="/js/jquery.intltelinput.min.js"></script>
@@ -40,7 +40,7 @@
             <div class="page-header">
                 <h1><a href="/">Fitminder</a> <small>Fitbit Idle Alert</small></h1>
             </div>
-            
+
             <div class="spacer spacer-sm"></div>
 
             <%- body %>

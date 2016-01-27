@@ -166,7 +166,7 @@ module.exports = function(app, Profile, passport) {
 
                     // update the user's profile currently stored in session
                     req.user = data;
-                    
+
                     // make sure that we have a subscription for the user
                     fitbit.createSubscription(Profile, data, next);
                 } else {
@@ -291,7 +291,7 @@ module.exports = function(app, Profile, passport) {
     app.post('/api/fitbit/notification', function(req, res, next) {
 
         // process the individual unique notifications
-        _.uniq(req.body, 'ownerId').forEach(function (item) {
+        _.uniqBy(req.body, 'ownerId').forEach(function (item) {
 
             // spawn the asynchronous waterfall handler
             async.waterfall([

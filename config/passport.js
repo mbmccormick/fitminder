@@ -14,9 +14,9 @@ module.exports = function(Profile, passport) {
             done(err, data);
         });
     });
-    
+
     var callbackURL = 'http://' + process.env.HOSTNAME + '/auth/fitbit/callback';
-    
+
     if (process.env.REQUIRE_SSL) {
         callbackURL = 'https://' + process.env.HOSTNAME + '/auth/fitbit/callback'
     }

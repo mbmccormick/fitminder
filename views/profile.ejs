@@ -16,14 +16,14 @@
     <p id="phoneVerificationStatus" class="text-danger">Your phone number has not yet been verified.</p>
     <% } %>
     <% } %>
-    
+
     <div class="spacer spacer-sm"></div>
-    
+
     <div class="form-group form-group-lg">
         <label class="control-label" for="iftttSecretKey">IFTTT Secret Key</label>
         <input class="form-control" id="iftttSecretKey" name="iftttSecretKey" value="<%= user.iftttSecretKey %>">
     </div>
-    
+
     <% if (user.iftttSecretKey) { %>
     <p class="text-muted">Notifications are being sent to IFTTT's Maker Channel with Event Name <var>fitminder</var>, instead of your phone number. Remove your IFTTT Secret Key to disable this functionality.</p>
     <% } else { %>
@@ -64,7 +64,7 @@
             <option value="23"<% if (user.endTime == 23) { %>selected<% } %>>11:00 PM</option>
         </select>
     </div>
-    
+
     <p class="text-muted">Your timezone is currently set to <%= user.timezone %>. You can change this on the Fitbit website.</p>
 
     <div class="checkbox">
@@ -120,7 +120,7 @@
 
                 return false;
             }
-            
+
             $("#phoneNumber").val($("#phoneNumber").intlTelInput("getNumber"));
         });
 
@@ -142,15 +142,15 @@
             parent.removeClass('has-error');
             $("#phoneValidationError").remove();
         });
-        
+
         var handler = StripeCheckout.configure({
             key: '<%= process.env.STRIPE_PUBLISHABLE_KEY %>',
             token: function(token) {
-                $('#token').val(token.id);                
+                $('#token').val(token.id);
                 $('form').submit();
             }
         });
-        
+
         $('#paymentLink').on('click', function(e) {
             handler.open({
                 name: 'Matt McCormick',
@@ -159,7 +159,7 @@
             });
             e.preventDefault();
         });
-        
+
         $(window).on('popstate', function() {
             handler.close();
         });
