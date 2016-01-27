@@ -8,7 +8,7 @@ exports.createSubscription = function(Profile, profile, next) {
     var maxAttempts = 2;
     var attempt = -1;
 
-    var friendlyRequest = function() {
+    var friendlyRequest = function(profile) {
         attempt++;
 
         if (attempt > 0) {
@@ -29,7 +29,7 @@ exports.createSubscription = function(Profile, profile, next) {
                         profile.oauthRefreshToken = token.refresh_token;
                         Profile.update(profile);
 
-                        friendlyRequest();
+                        return friendlyRequest(profile);
                     }).catch(function(error) {
                         console.error('Failed');
                         return next(error);
@@ -49,7 +49,7 @@ exports.createSubscription = function(Profile, profile, next) {
         });
     };
 
-    return friendlyRequest();
+    return friendlyRequest(profile);
 }
 
 exports.deleteSubscription = function(Profile, profile, next) {
@@ -60,7 +60,7 @@ exports.deleteSubscription = function(Profile, profile, next) {
     var maxAttempts = 2;
     var attempt = -1;
 
-    var friendlyRequest = function() {
+    var friendlyRequest = function(profile) {
         attempt++;
 
         if (attempt > 0) {
@@ -81,7 +81,7 @@ exports.deleteSubscription = function(Profile, profile, next) {
                         profile.oauthRefreshToken = token.refresh_token;
                         Profile.update(profile);
 
-                        friendlyRequest();
+                        return friendlyRequest(profile);
                     }).catch(function(error) {
                         console.error('Failed');
                         return next(error);
@@ -101,7 +101,7 @@ exports.deleteSubscription = function(Profile, profile, next) {
         });
     };
 
-    return friendlyRequest();
+    return friendlyRequest(profile);
 }
 
 exports.getTimeseries = function(Profile, profile, next) {
@@ -112,7 +112,7 @@ exports.getTimeseries = function(Profile, profile, next) {
     var maxAttempts = 2;
     var attempt = -1;
 
-    var friendlyRequest = function() {
+    var friendlyRequest = function(profile) {
         attempt++;
 
         if (attempt > 0) {
@@ -133,7 +133,7 @@ exports.getTimeseries = function(Profile, profile, next) {
                         profile.oauthRefreshToken = token.refresh_token;
                         Profile.update(profile);
 
-                        friendlyRequest();
+                        return friendlyRequest(profile);
                     }).catch(function(error) {
                         console.error('Failed');
                         return next(error);
@@ -152,7 +152,7 @@ exports.getTimeseries = function(Profile, profile, next) {
         });
     };
 
-    return friendlyRequest();
+    return friendlyRequest(profile);
 }
 
 exports.getActivities = function(Profile, profile, next) {
@@ -163,7 +163,7 @@ exports.getActivities = function(Profile, profile, next) {
     var maxAttempts = 2;
     var attempt = -1;
 
-    var friendlyRequest = function() {
+    var friendlyRequest = function(profile) {
         attempt++;
 
         if (attempt > 0) {
@@ -184,7 +184,7 @@ exports.getActivities = function(Profile, profile, next) {
                         profile.oauthRefreshToken = token.refresh_token;
                         Profile.update(profile);
 
-                        friendlyRequest();
+                        return friendlyRequest(profile);
                     }).catch(function(error) {
                         console.error('Failed');
                         return next(error);
@@ -203,5 +203,5 @@ exports.getActivities = function(Profile, profile, next) {
         });
     };
 
-    return friendlyRequest();
+    return friendlyRequest(profile);
 }
