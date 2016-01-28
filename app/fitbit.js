@@ -1,5 +1,40 @@
 var FitbitApiClient = require('fitbit-node-oauth2');
 
+exports.obtainOauth20Credentials = function(Profile, profile, next) {
+    console.log('Attempting to obtain OAuth 2.0 credentials for ' + profile.id);
+
+    var refreshToken = profile.oauthToken + ':' + profile.oauthTokenSecret;
+
+    return client.refreshAccesstoken(profile.oauthToken, refreshToken).then(function(token) {
+        console.log('Succeeded');
+        
+        profile.oauthAccessToken = token.access_token;
+        profile.oauthRefreshToken = token.refresh_token;
+        
+        Profile.update(profile);
+    }).catch(function(error) {
+        console.error('Failed');
+        return next(error);
+    });
+}
+
+exports.removeOauth10Credentials = function(Profile, profile, next) {
+    console.log('Removing OAuth 1.0 credentials for ' + profile.id);
+    
+    if (profile.oauthAccessToken &&
+        profile.oauthRefreshToken) {
+        profile.oauthToken = null;
+        profile.oauthTokenSecret = null;
+        
+        Profile.update(profile);
+        
+        console.log('Succeeded');
+    } else {
+        console.error('Failed');
+        return next(new Error('Failed to remove OAuth 1.0 credentials'));
+    }
+};
+
 exports.createSubscription = function(Profile, profile, next) {
     console.log('Attempting to create subscription for ' + profile.id);
 
@@ -27,6 +62,7 @@ exports.createSubscription = function(Profile, profile, next) {
 
                         profile.oauthAccessToken = token.access_token;
                         profile.oauthRefreshToken = token.refresh_token;
+
                         Profile.update(profile);
 
                         return friendlyRequest(profile);
@@ -79,6 +115,7 @@ exports.deleteSubscription = function(Profile, profile, next) {
 
                         profile.oauthAccessToken = token.access_token;
                         profile.oauthRefreshToken = token.refresh_token;
+
                         Profile.update(profile);
 
                         return friendlyRequest(profile);
@@ -131,6 +168,7 @@ exports.getTimeseries = function(Profile, profile, next) {
 
                         profile.oauthAccessToken = token.access_token;
                         profile.oauthRefreshToken = token.refresh_token;
+
                         Profile.update(profile);
 
                         return friendlyRequest(profile);
@@ -182,6 +220,7 @@ exports.getActivities = function(Profile, profile, next) {
 
                         profile.oauthAccessToken = token.access_token;
                         profile.oauthRefreshToken = token.refresh_token;
+
                         Profile.update(profile);
 
                         return friendlyRequest(profile);

@@ -313,6 +313,25 @@ module.exports = function(app, Profile, passport) {
                         }
                     });
                 },
+                
+                function(data, callback) {
+
+                    // check if user needs to be upgraded to OAuth 2.0
+                    if (data.oauthAccessToken &&
+                        data.oauthRefreshToken) {
+                        // user is already upgraded
+                        callback(null, data);
+                    } else {
+                        // user needs to be upgraded
+                        fitbit.obtainOauth20Credentials(Profile, data, next).then(function() {
+                            fitbit.removeOauth10Credentials(Profile, data, next);
+                            
+                            callback(null, data);
+                        }).catch(function(error) {
+                            callback(new Error('Failed to upgrade user to OAuth 2.0'));
+                        });
+                    }
+                },
 
                 function(data, callback) {
                     // check if user has an active account
