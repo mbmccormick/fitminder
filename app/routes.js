@@ -324,8 +324,6 @@ module.exports = function(app, Profile, passport) {
                     } else {
                         // user needs to be upgraded
                         fitbit.obtainOauth20Credentials(Profile, data, next).then(function() {
-                            fitbit.removeOauth10Credentials(Profile, data, next);
-                            
                             callback(null, data);
                         }).catch(function(error) {
                             callback(new Error('Failed to upgrade user to OAuth 2.0'));
