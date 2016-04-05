@@ -29,6 +29,14 @@ p.subhero {
 p.lead b {
   color: #333333;
 }
+a.banner {
+  display: block;
+  padding: 15px 20px;
+  font-weight: bold;
+  color: #333;
+  text-align: center;
+  background-color: #fcf8e3;
+}
 .container {
   max-width: 850px;
   padding: 0 60px;
