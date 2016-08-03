@@ -11,7 +11,6 @@
         "documentdb": "^1.5.1",
         "passport": "^0.3.2",
         "passport-fitbit-oauth2": "^1.0.1",
-        "raygun": "^0.8.4",
         "async": "^1.5.2",
         "lodash": "^4.0.0",
         "fitbit-node-oauth2": "^2.0.3",
