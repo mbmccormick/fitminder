@@ -13,8 +13,6 @@ var Profile = require('./app/models/profile');
 var passport = require('passport');
 var moment = require('moment-timezone');
 
-var raygun = require('raygun');
-
 var app = express();
 
 // configuration ===============================================================
@@ -66,17 +64,6 @@ app.locals.subtract = function (date, amount, unit) {
 
 // routes ======================================================================
 require('./app/routes')(app, profile, passport);
-
-// error handling ==============================================================
-var raygunClient = new raygun.Client().init({ apiKey: process.env.RAYGUN_API_KEY });
-
-raygunClient.user = function (req) {
-    if (req.user) {
-        return req.user.id;
-    }
-}
-
-app.use(raygunClient.expressHandler);
 
 // listen ======================================================================
 app.listen(app.get('port'), function() {
