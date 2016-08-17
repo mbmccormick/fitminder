@@ -1,4 +1,4 @@
-var FitbitApiClient = require('fitbit-node-oauth2');
+var FitbitApiClient = require('fitbit-node');
 
 exports.obtainOauth20Credentials = function(Profile, profile, next) {
     console.log('Attempting to obtain OAuth 2.0 credentials for ' + profile.id);
