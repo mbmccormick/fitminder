@@ -1,0 +1,98 @@
+html {
+  position: relative;
+  min-height: 100%;
+}
+body {
+  background-image: url(../img/background.png);
+  background-attachment: fixed;
+}
+h1 a, h1 a:hover {
+  color: #333333;
+  text-decoration: none;
+}
+a.btn-lg {
+  padding: 20px 21px 18px;
+}
+a.text-danger, a.text-danger:hover {
+  color: #ff4136;
+}
+p.lead {
+  font-size: 200%;
+}
+p.lead b {
+  color: #333333;
+}
+p.subhero {
+  margin: 26px 0;
+  font-size: 115%;
+}
+p.lead b {
+  color: #333333;
+}
+a.banner {
+  display: block;
+  padding: 15px 20px;
+  font-weight: bold;
+  color: #333;
+  text-align: center;
+  background-color: #fcf8e3;
+}
+.container {
+  max-width: 850px;
+  padding: 0 60px;
+  background-color: #ffffff;
+}
+.spacer {
+}
+.spacer-lg {
+  height: 50px;
+}
+.spacer-sm {
+  height: 25px;
+}
+.checkbox {
+  margin: 40px 0px 20px 0px;
+}
+.checkbox input {
+  width: 25px;
+  height: 25px;
+  margin-top: 2px;
+}
+.checkbox span {
+  margin-left: 15px;
+}
+.footer {
+  margin-right: auto;
+  margin-left: auto;
+  max-width: 850px;
+  padding: 5px 60px;
+  background-color: #f5f5f5;
+}
+.footer a {
+  color: #666666;  
+}
+.footer .text-muted {
+  margin: 26px 0;
+}
+@media screen and (max-width:767px) {
+  h1 small {
+    display: none;
+  }
+  .container {
+	padding: 0 25px;
+  }
+  .footer {
+	padding: 5px 25px;
+  }
+  .page-header {
+    margin: 0px 0px 15px;
+  }
+  .spacer {
+  }
+  .spacer-lg {
+    height: 20px;
+  }
+  .spacer-sm {
+    height: 10px;
+  }
+}

@@ -1,0 +1,6 @@
+.sass-cache
+.DS_Store
+ehthumbs.db
+Thumbs.db
+*.scssc
+_site/
